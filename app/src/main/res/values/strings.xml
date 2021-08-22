@@ -2,4 +2,11 @@
     <string name="app_name">TriviaApp</string>
     <string name="app_title">Trivia App</string>
     <string name="play">Play</string>
+    <string name="any">Any</string>
+    <string name="category">Category:</string>
+    <string name="easy">Easy</string>
+    <string name="medium">Medium</string>
+    <string name="hard">Hard</string>
+    <string name="difficulty">Difficulty:</string>
+    <string name="next">Next</string>
 </resources>

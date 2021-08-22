@@ -4,6 +4,7 @@ import com.example.triviaapp.ui.database.daos.CategoryDao
 import com.example.triviaapp.ui.database.entities.CategoryEntity
 import com.example.triviaapp.ui.network.services.TriviaService
 import com.example.triviaapp.ui.utils.toModel
+import kotlinx.coroutines.flow.map
 import javax.inject.Inject
 
 class TriviaRepository @Inject constructor(
@@ -41,4 +42,7 @@ class TriviaRepository @Inject constructor(
 
     suspend fun getCategories() = categoryDao.getCategories()
         .map { it.toModel() }
+
+    fun getCategoriesFlow() = categoryDao.getCategoriesFlow()
+        .map { it.map { categoryEntity -> categoryEntity.toModel() } }
 }

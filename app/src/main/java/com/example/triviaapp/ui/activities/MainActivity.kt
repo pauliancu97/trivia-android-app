@@ -14,6 +14,7 @@ import androidx.navigation.compose.composable
 import androidx.navigation.compose.rememberNavController
 import com.example.triviaapp.ui.navigation.NavigationDestinations
 import com.example.triviaapp.ui.screens.createquiz.CreateQuizFirstScreen
+import com.example.triviaapp.ui.screens.createquiz.CreateQuizFirstScreenViewModel
 import com.example.triviaapp.ui.screens.start.StartScreen
 import com.example.triviaapp.ui.screens.start.StartScreenViewModel
 import com.example.triviaapp.ui.theme.TriviaAppTheme
@@ -57,7 +58,8 @@ fun TriviaAppNavHost() {
             )
         }
         composable(NavigationDestinations.CreateQuizFirstScreen.name) {
-            CreateQuizFirstScreen()
+            val viewModel = hiltViewModel<CreateQuizFirstScreenViewModel>()
+            CreateQuizFirstScreen(viewModel)
         }
     }
 }

@@ -6,6 +6,7 @@ import androidx.room.OnConflictStrategy
 import androidx.room.Query
 import com.example.triviaapp.ui.database.entities.CategoryEntity
 import com.example.triviaapp.ui.models.Category
+import kotlinx.coroutines.flow.Flow
 
 @Dao
 interface CategoryDao {
@@ -17,4 +18,7 @@ interface CategoryDao {
 
     @Query("SELECT * FROM ${CategoryEntity.TABLE_NAME}")
     suspend fun getCategories(): List<CategoryEntity>
+
+    @Query("SELECT * FROM ${CategoryEntity.TABLE_NAME}")
+    fun getCategoriesFlow(): Flow<List<CategoryEntity>>
 }
