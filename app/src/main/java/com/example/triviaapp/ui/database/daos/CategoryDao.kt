@@ -14,7 +14,7 @@ interface CategoryDao {
     suspend fun insertAll(categories: List<CategoryEntity>)
 
     @Query("SELECT * FROM ${CategoryEntity.TABLE_NAME} WHERE ${CategoryEntity.ID_COLUMN} = :id LIMIT 1")
-    suspend fun getById(id: Int): CategoryEntity?
+    suspend fun getCategoryById(id: Int): CategoryEntity?
 
     @Query("SELECT * FROM ${CategoryEntity.TABLE_NAME}")
     suspend fun getCategories(): List<CategoryEntity>

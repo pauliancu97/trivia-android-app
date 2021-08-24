@@ -43,6 +43,9 @@ class TriviaRepository @Inject constructor(
     suspend fun getCategories() = categoryDao.getCategories()
         .map { it.toModel() }
 
+    suspend fun getCategoryById(id: Int) =
+        categoryDao.getCategoryById(id)?.toModel()
+
     fun getCategoriesFlow() = categoryDao.getCategoriesFlow()
         .map { it.map { categoryEntity -> categoryEntity.toModel() } }
 }

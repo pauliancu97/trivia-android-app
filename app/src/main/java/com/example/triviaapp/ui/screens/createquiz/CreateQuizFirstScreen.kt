@@ -22,7 +22,8 @@ import com.example.triviaapp.ui.models.DifficultyOption
 
 @Composable
 fun CreateQuizFirstScreen(
-    viewModel: CreateQuizFirstScreenViewModel
+    viewModel: CreateQuizFirstScreenViewModel,
+    onNavigateToCreateQuizSecondScreen: (Int, String, Int) -> Unit
 ) {
     val state by viewModel.stateFlow.collectAsState(CreateQuizFirstScreenState())
     CreateQuizFirstScreen(
@@ -44,7 +45,12 @@ fun CreateQuizFirstScreen(
             viewModel.onDifficultySelected(difficultyOption)
             viewModel.setDifficultyListExpandedState(false)
         },
-        onNextClick = {}
+        onNextClick = {
+            val categoryId = viewModel.getSelectedCategory()?.id ?: 0
+            val difficulty = viewModel.getSelectedDifficulty().name
+            val numQuestions = viewModel.getMaxNumOfQuestions()
+            onNavigateToCreateQuizSecondScreen(categoryId, difficulty, numQuestions)
+        }
     )
 }
 

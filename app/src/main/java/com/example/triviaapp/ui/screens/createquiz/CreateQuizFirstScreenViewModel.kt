@@ -51,4 +51,40 @@ class CreateQuizFirstScreenViewModel @Inject constructor(
     fun setDifficultyListExpandedState(expanded: Boolean) {
         mutableStateFlow.update { copy(isDifficultiesListExpanded = expanded) }
     }
+
+    fun getSelectedCategory() = (mutableStateFlow.value.selectedCategoryOption as? CategoryOption.ConcreteCategory)?.category
+
+    fun getSelectedDifficulty() = mutableStateFlow.value.selectedDifficultyOption
+
+    fun getMaxNumOfQuestions(): Int {
+        val numOfQuestions: Int
+        val numOfEasyQuestions: Int
+        val numOfMediumQuestions: Int
+        val numOfHardQuestions: Int
+
+        when (val categoryOption = mutableStateFlow.value.selectedCategoryOption) {
+            CategoryOption.Any -> {
+                val categories = mutableStateFlow.value.categoriesOptions
+                    .mapNotNull { (it as? CategoryOption.ConcreteCategory)?.category }
+                numOfQuestions = categories.sumOf { it.numOfQuestions }
+                numOfEasyQuestions = categories.sumOf { it.numOfEasyQuestions }
+                numOfMediumQuestions = categories.sumOf { it.numOfMediumQuestions }
+                numOfHardQuestions = categories.sumOf { it.numOfHardQuestions }
+            }
+            is CategoryOption.ConcreteCategory -> {
+                val category = categoryOption.category
+                numOfQuestions = category.numOfQuestions
+                numOfEasyQuestions = category.numOfEasyQuestions
+                numOfMediumQuestions = category.numOfMediumQuestions
+                numOfHardQuestions = category.numOfHardQuestions
+            }
+        }
+
+        return when (mutableStateFlow.value.selectedDifficultyOption) {
+            DifficultyOption.Any -> numOfQuestions
+            DifficultyOption.Easy -> numOfEasyQuestions
+            DifficultyOption.Medium -> numOfMediumQuestions
+            DifficultyOption.Hard -> numOfHardQuestions
+        }
+    }
 }
