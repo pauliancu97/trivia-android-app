@@ -21,3 +21,17 @@ sealed class Question {
         val correctAnswer: Boolean
     ) : Question()
 }
+
+enum class QuestionType {
+    Multiple,
+    Boolean;
+
+    companion object {
+        fun fromString(string: String) =
+            when (string) {
+                "multiple" -> Multiple
+                "boolean" -> Boolean
+                else -> null
+            }
+    }
+}

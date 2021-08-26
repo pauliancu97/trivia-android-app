@@ -5,6 +5,22 @@ import com.example.triviaapp.R
 enum class Difficulty(val id: Int, val textId: Int) {
     Easy(0, R.string.easy),
     Medium(1, R.string.medium),
-    Hard(2, R.string.hard)
+    Hard(2, R.string.hard);
+
+    fun apiString() = when (this) {
+        Easy -> "easy"
+        Medium -> "medium"
+        Hard -> "hard"
+    }
+
+    companion object {
+        fun fromString(string: String) =
+            when (string) {
+                "easy" -> Easy
+                "medium" -> Medium
+                "hard" -> Hard
+                else -> null
+            }
+    }
 }
 

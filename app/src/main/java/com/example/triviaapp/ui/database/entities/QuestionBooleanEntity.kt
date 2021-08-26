@@ -6,7 +6,7 @@ import com.example.triviaapp.ui.models.Difficulty
 
 @Entity
 data class QuestionBooleanEntity(
-    @PrimaryKey(autoGenerate = true) val id: Int,
+    @PrimaryKey(autoGenerate = true) val id: Int = 0,
     val text: String,
     val categoryId: Int,
     val difficulty: Difficulty,
