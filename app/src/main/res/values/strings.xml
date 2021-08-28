@@ -9,4 +9,14 @@
     <string name="hard">Hard</string>
     <string name="difficulty">Difficulty:</string>
     <string name="next">Next</string>
+    <string name="num_of_questions">Number of questions:</string>
+    <string name="time_limit">Time Limit (seconds):</string>
+    <string name="limit_num_of_questions">Min number of questions is %1$d, max number of questions is %2$d.</string>
+    <string name="limit_time_limit">Min time limit is %1$d seconds, max time limit is %2$d seconds.</string>
+    <string name="error_num_questions_too_low">Number of questions is too low.</string>
+    <string name="error_num_questions_too_high">Number of questions is too high.</string>
+    <string name="error_time_limit_too_low">Time limit is too low.</string>
+    <string name="error_time_limit_too_high">Time limit questions is too high.</string>
+    <string name="error_num_questions_empty">Number of questions field can\'t be empty</string>
+    <string name="error_time_limit_empty">Time limit field can\'t be empty</string>
 </resources>

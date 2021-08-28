@@ -65,10 +65,10 @@ class TriviaRepository @Inject constructor(
     fun getCategoriesFlow() = categoryDao.getCategoriesFlow()
         .map { it.map { categoryEntity -> categoryEntity.toModel() } }
 
-    suspend fun fetchQuestions(category: Category?, difficulty: Difficulty?, numOfQuestion: Int) {
+    suspend fun fetchQuestions(category: Category?, difficulty: Difficulty?, numOfQuestions: Int) {
         val token = triviaService.getTokenResponse().token
         val questionsResponses = mutableListOf<QuestionResponse>()
-        val numLimitApiCalls = numOfQuestion / NUM_MAX_QUESTIONS_PER_CALL
+        val numLimitApiCalls = numOfQuestions / NUM_MAX_QUESTIONS_PER_CALL
         for (index in 1..numLimitApiCalls) {
             val questionLookupResponse = triviaService.getQuestionsLookupResponse(
                 difficulty = difficulty?.apiString(),
@@ -78,7 +78,7 @@ class TriviaRepository @Inject constructor(
             )
             questionsResponses.addAll(questionLookupResponse.results)
         }
-        val restNumOfQuestions = numOfQuestion % NUM_MAX_QUESTIONS_PER_CALL
+        val restNumOfQuestions = numOfQuestions % NUM_MAX_QUESTIONS_PER_CALL
         if (restNumOfQuestions != 0) {
             val questionLookupResponse = triviaService.getQuestionsLookupResponse(
                 difficulty = difficulty?.apiString(),

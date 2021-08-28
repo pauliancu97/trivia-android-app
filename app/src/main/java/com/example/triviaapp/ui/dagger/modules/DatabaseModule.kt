@@ -21,9 +21,11 @@ class DatabaseModule {
     fun provideCategoryDao(triviaDatabase: TriviaDatabase): CategoryDao =
         triviaDatabase.categoryDao()
 
+    @Provides
     fun provideQuestionDao(triviaDatabase: TriviaDatabase): QuestionDao =
         triviaDatabase.questionDao()
 
+    @Provides
     fun provideAnswerDao(triviaDatabase: TriviaDatabase): AnswerDao =
         triviaDatabase.answerDao()
 
@@ -35,6 +37,8 @@ class DatabaseModule {
         context,
         TriviaDatabase::class.java,
         TriviaDatabase.DATABASE_NAME
-    ).build()
+    )
+        .fallbackToDestructiveMigration()
+        .build()
 
 }
