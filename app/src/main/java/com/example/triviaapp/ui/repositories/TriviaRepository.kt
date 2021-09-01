@@ -14,7 +14,11 @@ import com.example.triviaapp.ui.models.QuestionType
 import com.example.triviaapp.ui.network.models.QuestionResponse
 import com.example.triviaapp.ui.network.services.TriviaService
 import com.example.triviaapp.ui.utils.toModel
+import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.flow.map
+import kotlinx.coroutines.withContext
+import timber.log.Timber
+import java.net.URLDecoder
 import javax.inject.Inject
 
 class TriviaRepository @Inject constructor(
@@ -65,14 +69,14 @@ class TriviaRepository @Inject constructor(
     fun getCategoriesFlow() = categoryDao.getCategoriesFlow()
         .map { it.map { categoryEntity -> categoryEntity.toModel() } }
 
-    suspend fun fetchQuestions(category: Category?, difficulty: Difficulty?, numOfQuestions: Int) {
+    suspend fun fetchQuestions(category: Category?, difficulty: Difficulty?, numOfQuestions: Int): List<Question> {
         val token = triviaService.getTokenResponse().token
         val questionsResponses = mutableListOf<QuestionResponse>()
         val numLimitApiCalls = numOfQuestions / NUM_MAX_QUESTIONS_PER_CALL
         for (index in 1..numLimitApiCalls) {
             val questionLookupResponse = triviaService.getQuestionsLookupResponse(
                 difficulty = difficulty?.apiString(),
-                category = category?.name,
+                category = category?.id,
                 numOfQuestions = NUM_MAX_QUESTIONS_PER_CALL,
                 token = token
             )
@@ -82,34 +86,43 @@ class TriviaRepository @Inject constructor(
         if (restNumOfQuestions != 0) {
             val questionLookupResponse = triviaService.getQuestionsLookupResponse(
                 difficulty = difficulty?.apiString(),
-                category = category?.name,
+                category = category?.id,
                 numOfQuestions = restNumOfQuestions,
                 token = token
             )
             questionsResponses.addAll(questionLookupResponse.results)
         }
+        Timber.d("Question response = $questionsResponses")
         val questionsModels = questionsResponses.mapNotNull { it.toQuestion() }
         questionsModels.forEach { insertQuestionInDatabase(it) }
+        return questionsModels
     }
+
+    private fun String.decode(): String =
+        try {
+            URLDecoder.decode(this, "UTF-8")
+        } catch (t: Throwable) {
+            this
+        }
 
     private suspend fun QuestionResponse.toQuestion(): Question? {
         val difficulty = Difficulty.fromString(this.difficulty) ?: return null
-        val category = categoryDao.getCategoryByName(this.category)?.toModel() ?: return null
+        val category = categoryDao.getCategoryByName(this.category.decode())?.toModel() ?: return null
         val questionType = QuestionType.fromString(this.type) ?: return null
         return when (questionType) {
             QuestionType.Multiple -> Question.QuestionMultiple(
-                text = question,
+                text = question.decode(),
                 category = category,
                 difficulty = difficulty,
-                answers = incorrectAnswers + correctAnswer,
-                correctAnswer = correctAnswer
+                answers = (incorrectAnswers + correctAnswer).map { it.decode() },
+                correctAnswer = correctAnswer.decode()
             )
             QuestionType.Boolean -> {
                 val incorrectAnswer = incorrectAnswers.firstOrNull()?.toBoolean()
                 val correctAnswer = correctAnswer.toBoolean()
                 if (incorrectAnswer != null && correctAnswer != null) {
                     Question.QuestionBoolean(
-                        text = question,
+                        text = question.decode(),
                         category = category,
                         difficulty = difficulty,
                         correctAnswer = correctAnswer
@@ -152,6 +165,33 @@ class TriviaRepository @Inject constructor(
                 questionDao.insert(questionEntity)
             }
         }
+    }
+
+    suspend fun getQuestions(): List<Question> {
+        val questionsBoolean = questionDao.getAllQuestionBoolean()
+            .map { it.toModel() }
+        val questionsMultiple = questionDao.getAllQuestionsMultiple()
+            .map { it.toModel() }
+        return questionsBoolean + questionsMultiple
+    }
+
+    private suspend fun QuestionBooleanEntity.toModel() =
+        Question.QuestionBoolean(
+            text = this.text,
+            category = categoryDao.getCategoryById(this.categoryId)?.toModel()!!,
+            difficulty = this.difficulty,
+            correctAnswer = this.correctAnswer
+        )
+
+    private suspend fun QuestionMultipleEntity.toModel(): Question.QuestionMultiple {
+        val questionAnswersEntities = answerDao.getAnswersForQuestionWithId(this.id)
+        return Question.QuestionMultiple(
+            text = this.text,
+            category = categoryDao.getCategoryById(this.categoryId)?.toModel()!!,
+            difficulty = this.difficulty,
+            answers = questionAnswersEntities.map { it.text },
+            correctAnswer = questionAnswersEntities.first { it.isCorrect }.text
+        )
     }
 
     private fun String.toBoolean() = when (this) {

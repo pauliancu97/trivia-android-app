@@ -20,9 +20,10 @@ interface TriviaService {
     @GET("api.php")
     suspend fun getQuestionsLookupResponse(
         @Query("difficulty") difficulty: String?,
-        @Query("category") category: String?,
+        @Query("category") category: Int?,
         @Query("amount") numOfQuestions: Int,
-        @Query("token") token: String
+        @Query("token") token: String,
+        @Query("encode") encode: String = "urlLegacy"
     ): QuestionsLookupResponse
 
     companion object {

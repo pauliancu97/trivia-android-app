@@ -20,6 +20,8 @@ import com.example.triviaapp.ui.screens.createquiz.CreateQuizFirstScreen
 import com.example.triviaapp.ui.screens.createquiz.CreateQuizFirstScreenViewModel
 import com.example.triviaapp.ui.screens.createquiz.CreateQuizSecondScreen
 import com.example.triviaapp.ui.screens.createquiz.CreateQuizSecondScreenViewModel
+import com.example.triviaapp.ui.screens.playquiz.PlayQuizScreen
+import com.example.triviaapp.ui.screens.playquiz.PlayQuizViewModel
 import com.example.triviaapp.ui.screens.start.StartScreen
 import com.example.triviaapp.ui.screens.start.StartScreenViewModel
 import com.example.triviaapp.ui.theme.TriviaAppTheme
@@ -102,7 +104,47 @@ fun TriviaAppNavHost() {
             val maxNumOfQuestions = navBackStackEntry.arguments?.getInt("numQuestions") ?: 0
             val viewModel = hiltViewModel<CreateQuizSecondScreenViewModel>()
             viewModel.initialize(categoryId, difficulty, maxNumOfQuestions)
-            CreateQuizSecondScreen(viewModel)
+            CreateQuizSecondScreen(
+                viewModel = viewModel,
+                onNavigateToPlayQuiz = { timeLimit, categoryId, difficultyId, numOfQuestions ->
+                    navController.navigate(
+                        "${NavigationDestinations.PlayQuizScreen.name}/$timeLimit/$categoryId/$difficultyId/$numOfQuestions"
+                    )
+                }
+            )
+        }
+        composable(
+            route = "${NavigationDestinations.PlayQuizScreen.name}/{timeLimit}/{categoryId}/{difficultyId}/{numOfQuestions}",
+            arguments = listOf(
+                navArgument(
+                    name = "timeLimit",
+                ) {
+                    type = NavType.IntType
+                },
+                navArgument(
+                    name = "categoryId",
+                ) {
+                    type = NavType.IntType
+                },
+                navArgument(
+                    name = "difficultyId",
+                ) {
+                    type = NavType.IntType
+                },
+                navArgument(
+                    name = "numOfQuestions",
+                ) {
+                    type = NavType.IntType
+                }
+            )
+        ) {
+            val timeLimit = it.arguments?.getInt("timeLimit") ?: 0
+            val categoryId = it.arguments?.getInt("categoryId") ?: 0
+            val difficulty = it.arguments?.getInt("difficultyId")?.let { id -> DifficultyOption.values().getOrNull(id) }
+            val numOfQuestions = it.arguments?.getInt("numOfQuestions") ?: 0
+            val viewModel = hiltViewModel<PlayQuizViewModel>()
+            viewModel.initialize(timeLimit, categoryId, difficulty?.toDifficulty(), numOfQuestions)
+            PlayQuizScreen(viewModel)
         }
     }
 }
