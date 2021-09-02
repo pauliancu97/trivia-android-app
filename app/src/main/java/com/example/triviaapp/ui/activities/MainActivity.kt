@@ -9,6 +9,7 @@ import androidx.compose.runtime.Composable
 import androidx.compose.runtime.collectAsState
 import androidx.compose.runtime.getValue
 import androidx.hilt.navigation.compose.hiltViewModel
+import androidx.lifecycle.viewmodel.compose.viewModel
 import androidx.navigation.NavType
 import androidx.navigation.compose.NavHost
 import androidx.navigation.compose.composable
@@ -22,34 +23,43 @@ import com.example.triviaapp.ui.screens.createquiz.CreateQuizSecondScreen
 import com.example.triviaapp.ui.screens.createquiz.CreateQuizSecondScreenViewModel
 import com.example.triviaapp.ui.screens.playquiz.PlayQuizScreen
 import com.example.triviaapp.ui.screens.playquiz.PlayQuizViewModel
+import com.example.triviaapp.ui.screens.playquiz.PlayQuizViewModelFactory
 import com.example.triviaapp.ui.screens.start.StartScreen
 import com.example.triviaapp.ui.screens.start.StartScreenViewModel
 import com.example.triviaapp.ui.theme.TriviaAppTheme
 import dagger.hilt.android.AndroidEntryPoint
+import javax.inject.Inject
 
 @AndroidEntryPoint
 class MainActivity : ComponentActivity() {
 
+    @Inject
+    lateinit var playQuizViewModelFactory: PlayQuizViewModelFactory
+
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         setContent {
-            TriviaApp()
+            TriviaApp(playQuizViewModelFactory)
         }
     }
 }
 
 @Composable
-fun TriviaApp() {
+fun TriviaApp(
+    playQuizViewModelFactory: PlayQuizViewModelFactory
+) {
     TriviaAppTheme {
         // A surface container using the 'background' color from the theme
         Surface(color = MaterialTheme.colors.background) {
-            TriviaAppNavHost()
+            TriviaAppNavHost(playQuizViewModelFactory)
         }
     }
 }
 
 @Composable
-fun TriviaAppNavHost() {
+fun TriviaAppNavHost(
+    playQuizViewModelFactory: PlayQuizViewModelFactory
+) {
     val navController = rememberNavController()
     NavHost(
         navController = navController,
@@ -142,8 +152,14 @@ fun TriviaAppNavHost() {
             val categoryId = it.arguments?.getInt("categoryId") ?: 0
             val difficulty = it.arguments?.getInt("difficultyId")?.let { id -> DifficultyOption.values().getOrNull(id) }
             val numOfQuestions = it.arguments?.getInt("numOfQuestions") ?: 0
-            val viewModel = hiltViewModel<PlayQuizViewModel>()
-            viewModel.initialize(timeLimit, categoryId, difficulty?.toDifficulty(), numOfQuestions)
+            val viewModel = viewModel<PlayQuizViewModel>(
+                factory = playQuizViewModelFactory.create(
+                    timeLimit,
+                    categoryId,
+                    difficulty?.toDifficulty(),
+                    numOfQuestions
+                )
+            )
             PlayQuizScreen(viewModel)
         }
     }

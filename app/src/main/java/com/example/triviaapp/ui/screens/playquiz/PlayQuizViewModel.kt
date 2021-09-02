@@ -1,6 +1,7 @@
 package com.example.triviaapp.ui.screens.playquiz
 
 import androidx.lifecycle.ViewModel
+import androidx.lifecycle.ViewModelProvider
 import androidx.lifecycle.viewModelScope
 import com.example.triviaapp.ui.models.Difficulty
 import com.example.triviaapp.ui.models.Question
@@ -14,9 +15,29 @@ import kotlinx.coroutines.flow.*
 import kotlinx.coroutines.launch
 import javax.inject.Inject
 
-@HiltViewModel
-class PlayQuizViewModel @Inject constructor(
+class PlayQuizViewModelFactory @Inject constructor(
     private val triviaRepository: TriviaRepository
+) {
+    fun create(
+        timeLimit: Int,
+        categoryId: Int,
+        difficulty: Difficulty?,
+        numOfQuestions: Int
+    ) = object : ViewModelProvider.Factory {
+        override fun <T : ViewModel?> create(modelClass: Class<T>): T {
+            return PlayQuizViewModel(
+                triviaRepository, timeLimit, categoryId, difficulty, numOfQuestions
+            ) as T
+        }
+    }
+}
+
+class PlayQuizViewModel @Inject constructor(
+    private val triviaRepository: TriviaRepository,
+    private val timeLimit: Int,
+    private val categoryId: Int,
+    private val difficulty: Difficulty?,
+    private val numOfQuestions: Int
 ): ViewModel() {
 
     private val mutableStateFlow: MutableStateFlow<PlayQuizViewModelState> =
@@ -34,6 +55,7 @@ class PlayQuizViewModel @Inject constructor(
                         question = currentQuestion,
                         timeLimit = state.timeLimit,
                         timeLeft = state.timeLeft,
+                        score = state.score,
                         selectedAnswer = state.selectedStringAnswer
                     )
                     is Question.QuestionBoolean -> PlayQuizUIState.QuizQuestionState.QuizBoolean(
@@ -42,13 +64,14 @@ class PlayQuizViewModel @Inject constructor(
                         question = currentQuestion,
                         timeLimit = state.timeLimit,
                         timeLeft = state.timeLeft,
+                        score = state.score,
                         selectedAnswer = state.selectedBooleanAnswer
                     )
                 }
             }
         }
 
-    fun initialize(timeLimit: Int, categoryId: Int, difficulty: Difficulty?, numOfQuestions: Int) {
+    init {
         mutableStateFlow.value = PlayQuizViewModelState(
             isLoading = true,
             timeLimit = timeLimit,
@@ -78,11 +101,37 @@ class PlayQuizViewModel @Inject constructor(
     }
 
     fun onSelectStringAnswer(answer: String) {
-        mutableStateFlow.update { copy(selectedStringAnswer = answer) }
+        val currentState = mutableStateFlow.value
+        val currentQuestion = currentState.questions.getOrNull(currentState.currentQuestionIndex) as? Question.QuestionMultiple
+        val correctAnswer = currentQuestion?.correctAnswer
+        val updatedScore = if (correctAnswer == answer) {
+            currentState.score + 1
+        } else {
+            currentState.score
+        }
+        mutableStateFlow.update {
+            copy(
+                selectedStringAnswer = answer,
+                score = updatedScore
+            )
+        }
     }
 
     fun onSelectBooleanAnswer(answer: Boolean) {
-        mutableStateFlow.update { copy(selectedBooleanAnswer = answer) }
+        val currentState = mutableStateFlow.value
+        val currentQuestion = currentState.questions.getOrNull(currentState.currentQuestionIndex) as? Question.QuestionBoolean
+        val correctAnswer = currentQuestion?.correctAnswer
+        val updatedScore = if (correctAnswer == answer) {
+            currentState.score + 1
+        } else {
+            currentState.score
+        }
+        mutableStateFlow.update {
+            copy(
+                selectedBooleanAnswer = answer,
+                score = updatedScore
+            )
+        }
     }
 
     private fun initTickerJob() {

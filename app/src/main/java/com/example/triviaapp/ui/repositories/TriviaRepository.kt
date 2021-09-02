@@ -92,7 +92,6 @@ class TriviaRepository @Inject constructor(
             )
             questionsResponses.addAll(questionLookupResponse.results)
         }
-        Timber.d("Question response = $questionsResponses")
         val questionsModels = questionsResponses.mapNotNull { it.toQuestion() }
         questionsModels.forEach { insertQuestionInDatabase(it) }
         return questionsModels

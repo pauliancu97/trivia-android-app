@@ -12,6 +12,7 @@ sealed class PlayQuizUIState {
         abstract val question: Question
         abstract val timeLimit: Int
         abstract val timeLeft: Int
+        abstract val score: Int
 
         data class QuizMultiple(
             override val questionIndex: Int,
@@ -19,6 +20,7 @@ sealed class PlayQuizUIState {
             override val question: Question.QuestionMultiple,
             override val timeLimit: Int,
             override val timeLeft: Int,
+            override val score: Int,
             val selectedAnswer: String? = null
         ) : QuizQuestionState()
 
@@ -28,6 +30,7 @@ sealed class PlayQuizUIState {
             override val question: Question.QuestionBoolean,
             override val timeLimit: Int,
             override val timeLeft: Int,
+            override val score: Int,
             val selectedAnswer: Boolean? = null
         ) : QuizQuestionState()
     }
