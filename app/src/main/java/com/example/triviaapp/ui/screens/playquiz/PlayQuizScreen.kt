@@ -3,6 +3,7 @@ package com.example.triviaapp.ui.screens.playquiz
 import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.*
 import androidx.compose.material.Button
+import androidx.compose.material.ButtonDefaults
 import androidx.compose.material.CircularProgressIndicator
 import androidx.compose.material.Text
 import androidx.compose.runtime.Composable
@@ -158,21 +159,20 @@ fun PlayQuizShowQuestionMultipleScreen(
                         }
                     },
                     modifier = Modifier
-                        .align(alignment = Alignment.CenterHorizontally)
-                        .background(
-                            color =
-                            if (!showResult) {
-                                Color.Blue
+                        .align(alignment = Alignment.CenterHorizontally),
+                    colors = ButtonDefaults.buttonColors(
+                        backgroundColor = if (!showResult) {
+                            Color.Blue
+                        } else {
+                            if (answer == questionState.question.correctAnswer) {
+                                Color.Green
+                            } else if (answer == questionState.selectedAnswer && answer != questionState.question.correctAnswer) {
+                                Color.Red
                             } else {
-                                if (answer == questionState.question.correctAnswer) {
-                                    Color.Green
-                                } else if (answer == questionState.selectedAnswer && answer != questionState.question.correctAnswer) {
-                                    Color.Red
-                                } else {
-                                    Color.Blue
-                                }
+                                Color.Blue
                             }
-                        )
+                        }
+                    )
                 ) {
                     Text(text = answer)
                 }
@@ -198,21 +198,20 @@ fun PlayQuizShowQuestionBooleanScreen(
                         }
                     },
                     modifier = Modifier
-                        .align(alignment = Alignment.CenterHorizontally)
-                        .background(
-                            color =
-                            if (!showResult) {
-                                Color.Blue
+                        .align(alignment = Alignment.CenterHorizontally),
+                    colors = ButtonDefaults.buttonColors(
+                        backgroundColor = if (!showResult) {
+                            Color.Blue
+                        } else {
+                            if (answer == questionState.question.correctAnswer) {
+                                Color.Green
+                            } else if (answer == questionState.selectedAnswer && answer != questionState.question.correctAnswer) {
+                                Color.Red
                             } else {
-                                if (answer == questionState.question.correctAnswer) {
-                                    Color.Green
-                                } else if (answer == questionState.selectedAnswer && answer != questionState.question.correctAnswer) {
-                                    Color.Red
-                                } else {
-                                    Color.Blue
-                                }
+                                Color.Blue
                             }
-                        )
+                        }
+                    )
                 ) {
                     Text(text = answerString)
                 }
