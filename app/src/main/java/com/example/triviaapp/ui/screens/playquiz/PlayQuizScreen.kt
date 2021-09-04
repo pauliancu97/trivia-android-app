@@ -83,6 +83,16 @@ fun PlayQuizShowQuestionScreen(questionState: PlayQuizUIState.QuizQuestionState)
             text = stringResource(
                 R.string.score,
                 questionState.score,
+                questionState.totalScore
+            ),
+            modifier = Modifier.align(
+                alignment = Alignment.CenterHorizontally
+            )
+        )
+        Text(
+            text = stringResource(
+                R.string.correct_answers,
+                questionState.correctAnswers,
                 questionState.numOfQuestions
             ),
             modifier = Modifier.align(
@@ -243,7 +253,9 @@ fun PreviewPlayQuizShowQuestionBooleanScreen() {
         timeLimit = 15,
         timeLeft = 8,
         selectedAnswer = null,
-        score = 3
+        score = 3,
+        totalScore = 34,
+        correctAnswers = 1
     ),
         onSelectAnswer = {}
     )
@@ -273,7 +285,9 @@ fun PreviewPlayQuizShowQuestionMultipleScreen() {
         timeLimit = 15,
         timeLeft = 8,
         selectedAnswer = null,
-        score = 3
+        score = 3,
+        totalScore = 34,
+        correctAnswers = 1
     ),
         onSelectAnswer = {}
     )
@@ -303,7 +317,9 @@ fun PreviewPlayQuizShowQuestionScreen() {
             timeLimit = 15,
             timeLeft = 8,
             selectedAnswer = null,
-            score = 3
+            score = 3,
+            totalScore = 34,
+            correctAnswers = 1
         )
     )
 }

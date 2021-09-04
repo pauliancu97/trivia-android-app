@@ -58,7 +58,9 @@ class PlayQuizViewModel @Inject constructor(
                         question = currentQuestion,
                         timeLimit = state.timeLimit,
                         timeLeft = state.timeLeft,
+                        totalScore = state.totalScore,
                         score = state.score,
+                        correctAnswers = state.correctAnswers,
                         selectedAnswer = state.selectedStringAnswer
                     )
                     is Question.QuestionBoolean -> PlayQuizUIState.QuizQuestionState.QuizBoolean(
@@ -67,7 +69,9 @@ class PlayQuizViewModel @Inject constructor(
                         question = currentQuestion,
                         timeLimit = state.timeLimit,
                         timeLeft = state.timeLeft,
+                        totalScore = state.totalScore,
                         score = state.score,
+                        correctAnswers = state.correctAnswers,
                         selectedAnswer = state.selectedBooleanAnswer
                     )
                 }
@@ -101,7 +105,8 @@ class PlayQuizViewModel @Inject constructor(
                                 question
                             }
                         },
-                    isLoading = false
+                    isLoading = false,
+                    totalScore = numOfQuestions * timeLimit
                 )
             }
             initTickerJob()
@@ -113,15 +118,16 @@ class PlayQuizViewModel @Inject constructor(
         val currentState = mutableStateFlow.value
         val currentQuestion = currentState.questions.getOrNull(currentState.currentQuestionIndex) as? Question.QuestionMultiple
         val correctAnswer = currentQuestion?.correctAnswer
-        val updatedScore = if (correctAnswer == answer) {
-            currentState.score + 1
+        val (updatedScore, updatedCorrectAnswers) = if (correctAnswer == answer) {
+            (currentState.score + currentState.timeLeft) to (currentState.correctAnswers + 1)
         } else {
-            currentState.score
+            currentState.score to currentState.correctAnswers
         }
         mutableStateFlow.update {
             copy(
                 selectedStringAnswer = answer,
-                score = updatedScore
+                score = updatedScore,
+                correctAnswers = updatedCorrectAnswers
             )
         }
     }
@@ -130,15 +136,16 @@ class PlayQuizViewModel @Inject constructor(
         val currentState = mutableStateFlow.value
         val currentQuestion = currentState.questions.getOrNull(currentState.currentQuestionIndex) as? Question.QuestionBoolean
         val correctAnswer = currentQuestion?.correctAnswer
-        val updatedScore = if (correctAnswer == answer) {
-            currentState.score + 1
+        val (updatedScore, updatedCorrectAnswers) = if (correctAnswer == answer) {
+            (currentState.score + currentState.timeLeft) to (currentState.correctAnswers + 1)
         } else {
-            currentState.score
+            currentState.score to currentState.correctAnswers
         }
         mutableStateFlow.update {
             copy(
                 selectedBooleanAnswer = answer,
-                score = updatedScore
+                score = updatedScore,
+                correctAnswers = updatedCorrectAnswers
             )
         }
     }

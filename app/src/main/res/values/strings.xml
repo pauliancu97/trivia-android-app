@@ -23,4 +23,8 @@
     <string name="true_label">True</string>
     <string name="false_label">False</string>
     <string name="score">Score %1$d/%2$d</string>
+    <string name="finished_quiz">Finished quiz!</string>
+    <string name="correct_answers">Correct answers: %1$d/%2$d</string>
+    <string name="replay_quiz">Replay quiz</string>
+    <string name="create_new_quiz">Create new quiz</string>
 </resources>
