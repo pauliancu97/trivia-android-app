@@ -21,6 +21,7 @@ import com.example.triviaapp.ui.screens.createquiz.CreateQuizFirstScreen
 import com.example.triviaapp.ui.screens.createquiz.CreateQuizFirstScreenViewModel
 import com.example.triviaapp.ui.screens.createquiz.CreateQuizSecondScreen
 import com.example.triviaapp.ui.screens.createquiz.CreateQuizSecondScreenViewModel
+import com.example.triviaapp.ui.screens.finishquiz.FinishQuizScreen
 import com.example.triviaapp.ui.screens.playquiz.PlayQuizScreen
 import com.example.triviaapp.ui.screens.playquiz.PlayQuizViewModel
 import com.example.triviaapp.ui.screens.playquiz.PlayQuizViewModelFactory
@@ -165,7 +166,43 @@ fun TriviaAppNavHost(
                     shouldFetchQuestions
                 )
             )
-            PlayQuizScreen(viewModel)
+            PlayQuizScreen(
+                viewModel,
+                onNavigateToFinishedQuiz = { score, totalScore, numOfCorrectAnswers, numOfQuestions ->
+                    val url = "${NavigationDestinations.FinishedQuizScreen.name}/$score/$totalScore/$numOfCorrectAnswers/$numOfQuestions"
+                    navController.navigate(url)
+                }
+            )
+        }
+        composable(
+            route = "${NavigationDestinations.FinishedQuizScreen.name}/{score}/{totalScore}/{numCorrectAnswers}/{numQuestions}",
+            arguments = listOf(
+                navArgument(name = "score") {
+                    type = NavType.IntType
+                },
+                navArgument(name = "totalScore") {
+                    type = NavType.IntType
+                },
+                navArgument(name = "numCorrectAnswers") {
+                    type = NavType.IntType
+                },
+                navArgument(name = "numQuestions") {
+                    type = NavType.IntType
+                }
+            )
+        ) { navBackStackEntry ->
+            val score = navBackStackEntry.arguments?.getInt("score", 0) ?: 0
+            val totalScore = navBackStackEntry.arguments?.getInt("totalScore", 0) ?: 0
+            val numOfCorrectAnswers = navBackStackEntry.arguments?.getInt("numCorrectAnswers", 0) ?: 0
+            val numOfQuestions = navBackStackEntry.arguments?.getInt("numQuestions", 0) ?: 0
+            FinishQuizScreen(
+                score = score,
+                totalScore = totalScore,
+                numOfQuestions = numOfQuestions,
+                numOfCorrectAnswers = numOfCorrectAnswers,
+                onReplayQuiz = {},
+                onCreateNewQuiz = {}
+            )
         }
     }
 }

@@ -7,9 +7,6 @@ import com.example.triviaapp.ui.models.Difficulty
 import com.example.triviaapp.ui.models.Question
 import com.example.triviaapp.ui.repositories.TriviaRepository
 import com.example.triviaapp.ui.utils.update
-import dagger.hilt.android.lifecycle.HiltViewModel
-import kotlinx.coroutines.Job
-import kotlinx.coroutines.NonCancellable.isActive
 import kotlinx.coroutines.delay
 import kotlinx.coroutines.flow.*
 import kotlinx.coroutines.launch
@@ -34,6 +31,8 @@ class PlayQuizViewModelFactory @Inject constructor(
     }
 }
 
+typealias OnQuizFinishedCallback = (Int, Int, Int, Int) -> Unit
+
 class PlayQuizViewModel @Inject constructor(
     private val triviaRepository: TriviaRepository,
     private val timeLimit: Int,
@@ -42,6 +41,14 @@ class PlayQuizViewModel @Inject constructor(
     private val numOfQuestions: Int,
     private val shouldFetchQuestions: Boolean
 ): ViewModel() {
+
+    private var onQuizFinishedCallback: OnQuizFinishedCallback? = null
+
+    fun setOnQuizFinishedCallback(callback: OnQuizFinishedCallback) {
+        if (onQuizFinishedCallback == null) {
+            onQuizFinishedCallback = callback
+        }
+    }
 
     private val mutableStateFlow: MutableStateFlow<PlayQuizViewModelState> =
         MutableStateFlow(PlayQuizViewModelState())
@@ -178,6 +185,16 @@ class PlayQuizViewModel @Inject constructor(
                                 selectedStringAnswer = null
                             )
                         }
+                    } else {
+                        mutableStateFlow.update {
+                            currentState.copy(isFinished = true)
+                        }
+                        onQuizFinishedCallback?.invoke(
+                            currentState.score,
+                            currentState.totalScore,
+                            currentState.correctAnswers,
+                            currentState.questions.size
+                        )
                     }
                 }
         }

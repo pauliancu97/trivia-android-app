@@ -12,7 +12,8 @@ data class PlayQuizViewModelState(
     val selectedBooleanAnswer: Boolean? = null,
     val totalScore: Int = 0,
     val score: Int = 0,
-    val correctAnswers: Int = 0
+    val correctAnswers: Int = 0,
+    val isFinished: Boolean = false
 ) {
     fun shouldShowResult(): Boolean =
         timeLeft == 0 || selectedStringAnswer != null || selectedBooleanAnswer != null
