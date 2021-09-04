@@ -118,13 +118,13 @@ fun TriviaAppNavHost(
                 viewModel = viewModel,
                 onNavigateToPlayQuiz = { timeLimit, categoryId, difficultyId, numOfQuestions ->
                     navController.navigate(
-                        "${NavigationDestinations.PlayQuizScreen.name}/$timeLimit/$categoryId/$difficultyId/$numOfQuestions"
+                        "${NavigationDestinations.PlayQuizScreen.name}/$timeLimit/$categoryId/$difficultyId/$numOfQuestions/true"
                     )
                 }
             )
         }
         composable(
-            route = "${NavigationDestinations.PlayQuizScreen.name}/{timeLimit}/{categoryId}/{difficultyId}/{numOfQuestions}",
+            route = "${NavigationDestinations.PlayQuizScreen.name}/{timeLimit}/{categoryId}/{difficultyId}/{numOfQuestions}/{shouldFetchQuestions}",
             arguments = listOf(
                 navArgument(
                     name = "timeLimit",
@@ -145,6 +145,9 @@ fun TriviaAppNavHost(
                     name = "numOfQuestions",
                 ) {
                     type = NavType.IntType
+                },
+                navArgument(name = "shouldFetchQuestions") {
+                    type = NavType.BoolType
                 }
             )
         ) {
@@ -152,12 +155,14 @@ fun TriviaAppNavHost(
             val categoryId = it.arguments?.getInt("categoryId") ?: 0
             val difficulty = it.arguments?.getInt("difficultyId")?.let { id -> DifficultyOption.values().getOrNull(id) }
             val numOfQuestions = it.arguments?.getInt("numOfQuestions") ?: 0
+            val shouldFetchQuestions = it.arguments?.getBoolean("shouldFetchQuestions", true) ?: true
             val viewModel = viewModel<PlayQuizViewModel>(
                 factory = playQuizViewModelFactory.create(
                     timeLimit,
                     categoryId,
                     difficulty?.toDifficulty(),
-                    numOfQuestions
+                    numOfQuestions,
+                    shouldFetchQuestions
                 )
             )
             PlayQuizScreen(viewModel)

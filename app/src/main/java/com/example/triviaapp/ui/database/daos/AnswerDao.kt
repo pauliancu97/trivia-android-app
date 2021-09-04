@@ -13,4 +13,7 @@ interface AnswerDao {
 
     @Query("SELECT * FROM ${QuestionAnswerEntity.TABLE_NAME} WHERE ${QuestionAnswerEntity.QUESTION_ID} = :questionId")
     suspend fun getAnswersForQuestionWithId(questionId: Int): List<QuestionAnswerEntity>
+
+    @Query("DELETE FROM ${QuestionAnswerEntity.TABLE_NAME}")
+    suspend fun deleteAll()
 }

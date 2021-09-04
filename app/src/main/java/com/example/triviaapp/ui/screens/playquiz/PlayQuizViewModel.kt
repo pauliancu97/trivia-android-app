@@ -22,11 +22,13 @@ class PlayQuizViewModelFactory @Inject constructor(
         timeLimit: Int,
         categoryId: Int,
         difficulty: Difficulty?,
-        numOfQuestions: Int
+        numOfQuestions: Int,
+        shouldFetchQuestions: Boolean
     ) = object : ViewModelProvider.Factory {
         override fun <T : ViewModel?> create(modelClass: Class<T>): T {
             return PlayQuizViewModel(
-                triviaRepository, timeLimit, categoryId, difficulty, numOfQuestions
+                triviaRepository, timeLimit, categoryId, difficulty, numOfQuestions,
+                shouldFetchQuestions
             ) as T
         }
     }
@@ -37,7 +39,8 @@ class PlayQuizViewModel @Inject constructor(
     private val timeLimit: Int,
     private val categoryId: Int,
     private val difficulty: Difficulty?,
-    private val numOfQuestions: Int
+    private val numOfQuestions: Int,
+    private val shouldFetchQuestions: Boolean
 ): ViewModel() {
 
     private val mutableStateFlow: MutableStateFlow<PlayQuizViewModelState> =
@@ -79,7 +82,13 @@ class PlayQuizViewModel @Inject constructor(
         )
         viewModelScope.launch {
             val category = triviaRepository.getCategoryById(categoryId)
-            val questions = triviaRepository.fetchQuestions(category, difficulty, numOfQuestions)
+            if (shouldFetchQuestions) {
+                triviaRepository.deleteAllQuestions()
+                triviaRepository.fetchQuestions(
+                    category, difficulty, numOfQuestions
+                )
+            }
+            val questions = triviaRepository.getQuestions().shuffled()
             mutableStateFlow.update {
                 copy(
                     questions = questions

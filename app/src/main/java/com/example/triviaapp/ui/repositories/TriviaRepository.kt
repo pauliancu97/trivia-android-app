@@ -1,5 +1,7 @@
 package com.example.triviaapp.ui.repositories
 
+import androidx.room.withTransaction
+import com.example.triviaapp.ui.database.TriviaDatabase
 import com.example.triviaapp.ui.database.daos.AnswerDao
 import com.example.triviaapp.ui.database.daos.CategoryDao
 import com.example.triviaapp.ui.database.daos.QuestionDao
@@ -25,7 +27,8 @@ class TriviaRepository @Inject constructor(
     private val triviaService: TriviaService,
     private val categoryDao: CategoryDao,
     private val questionDao: QuestionDao,
-    private val answerDao: AnswerDao
+    private val answerDao: AnswerDao,
+    private val triviaDatabase: TriviaDatabase
 ){
 
     companion object {
@@ -172,6 +175,13 @@ class TriviaRepository @Inject constructor(
         val questionsMultiple = questionDao.getAllQuestionsMultiple()
             .map { it.toModel() }
         return questionsBoolean + questionsMultiple
+    }
+
+    suspend fun deleteAllQuestions() {
+        triviaDatabase.withTransaction {
+            questionDao.deleteAllQuestions()
+            answerDao.deleteAll()
+        }
     }
 
     private suspend fun QuestionBooleanEntity.toModel() =

@@ -4,6 +4,7 @@ import androidx.room.Dao
 import androidx.room.Insert
 import androidx.room.OnConflictStrategy.REPLACE
 import androidx.room.Query
+import androidx.room.Transaction
 import com.example.triviaapp.ui.database.entities.QuestionBooleanEntity
 import com.example.triviaapp.ui.database.entities.QuestionMultipleEntity
 
@@ -20,4 +21,16 @@ interface QuestionDao {
 
     @Query("SELECT * FROM ${QuestionBooleanEntity.TABLE_NAME}")
     suspend fun getAllQuestionBoolean(): List<QuestionBooleanEntity>
+
+    @Query("DELETE FROM ${QuestionBooleanEntity.TABLE_NAME}")
+    suspend fun deleteAllQuestionsBoolean()
+
+    @Query("DELETE FROM ${QuestionMultipleEntity.TABLE_NAME}")
+    suspend fun deleteAllQuestionsMultiple()
+
+    @Transaction
+    suspend fun deleteAllQuestions() {
+        deleteAllQuestionsMultiple()
+        deleteAllQuestionsBoolean()
+    }
 }
