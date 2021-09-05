@@ -1,11 +1,9 @@
 package com.example.triviaapp.ui.screens.playquiz
 
+import androidx.activity.compose.BackHandler
 import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.*
-import androidx.compose.material.Button
-import androidx.compose.material.ButtonDefaults
-import androidx.compose.material.CircularProgressIndicator
-import androidx.compose.material.Text
+import androidx.compose.material.*
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.collectAsState
 import androidx.compose.runtime.getValue
@@ -25,14 +23,22 @@ import kotlinx.coroutines.launch
 @Composable
 fun PlayQuizScreen(
     viewModel: PlayQuizViewModel,
-    onNavigateToFinishedQuiz: (Int, Int, Int, Int) -> Unit
+    onNavigateToFinishedQuiz: (Int, Int, Int, Int) -> Unit,
+    onNavigateToCreateQuiz: () -> Unit
 ) {
     viewModel.setOnQuizFinishedCallback(onNavigateToFinishedQuiz)
     val uiState by viewModel.uiStateFlow.collectAsState(initial = PlayQuizUIState.LoadingState)
+    val isQuitQuizDialogShown by viewModel.isQuitQuizDialogShownFlow.collectAsState(initial = false)
     PlayQuizScreen(
         state = uiState,
         onSelectedStringAnswer = { answer -> viewModel.onSelectStringAnswer(answer) },
-        onSelectedBooleanAnswer = { answer -> viewModel.onSelectBooleanAnswer(answer) }
+        onSelectedBooleanAnswer = { answer -> viewModel.onSelectBooleanAnswer(answer) },
+        isQuitQuizDialogShown = isQuitQuizDialogShown,
+        onChangeIsQuitQuizDialogShown = { visible -> viewModel.updateQuitQuizDialogShownStatus(visible) },
+        onQuitQuiz = {
+            viewModel.finish()
+            onNavigateToCreateQuiz()
+        }
     )
 }
 
@@ -40,7 +46,10 @@ fun PlayQuizScreen(
 fun PlayQuizScreen(
     state: PlayQuizUIState,
     onSelectedStringAnswer: (String) -> Unit,
-    onSelectedBooleanAnswer: (Boolean) -> Unit
+    onSelectedBooleanAnswer: (Boolean) -> Unit,
+    isQuitQuizDialogShown: Boolean,
+    onChangeIsQuitQuizDialogShown: (Boolean) -> Unit,
+    onQuitQuiz: () -> Unit
 ) {
     when (state) {
         PlayQuizUIState.LoadingState -> PlayQuizScreenLoading()
@@ -51,6 +60,30 @@ fun PlayQuizScreen(
         is PlayQuizUIState.QuizQuestionState.QuizBoolean -> PlayQuizShowQuestionBooleanScreen(
             questionState = state,
             onSelectAnswer = onSelectedBooleanAnswer
+        )
+    }
+    BackHandler(
+        onBack = { onChangeIsQuitQuizDialogShown(true) }
+    )
+    if (isQuitQuizDialogShown) {
+        AlertDialog(
+            onDismissRequest = { onChangeIsQuitQuizDialogShown(false) },
+            title = {
+                Text(text = stringResource(R.string.quit_quiz_title))
+            },
+            text = {
+                Text(text = stringResource(R.string.quit_quiz_message))
+            },
+            confirmButton = {
+                TextButton(onClick = { onQuitQuiz() }) {
+                    Text(text = stringResource(R.string.yes))
+                }
+            },
+            dismissButton = {
+                TextButton(onClick = { onChangeIsQuitQuizDialogShown(false) }) {
+                    Text(text = stringResource(R.string.no))
+                }
+            }
         )
     }
 }

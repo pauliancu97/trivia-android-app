@@ -27,4 +27,8 @@
     <string name="correct_answers">Correct answers: %1$d/%2$d</string>
     <string name="replay_quiz">Replay quiz</string>
     <string name="create_new_quiz">Create new quiz</string>
+    <string name="quit_quiz_title">Quit Quiz</string>
+    <string name="quit_quiz_message">Are you sure you want to quit the current quiz?</string>
+    <string name="yes">Yes</string>
+    <string name="no">No</string>
 </resources>

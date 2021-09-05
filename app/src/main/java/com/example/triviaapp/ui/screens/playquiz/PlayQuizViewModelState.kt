@@ -13,8 +13,10 @@ data class PlayQuizViewModelState(
     val totalScore: Int = 0,
     val score: Int = 0,
     val correctAnswers: Int = 0,
-    val isFinished: Boolean = false
+    val isInitialized: Boolean = false,
+    val isFinished: Boolean = false,
+    val isWarningDialogShown: Boolean = false
 ) {
     fun shouldShowResult(): Boolean =
-        timeLeft == 0 || selectedStringAnswer != null || selectedBooleanAnswer != null
+        (timeLeft == 0 || selectedStringAnswer != null || selectedBooleanAnswer != null) && !isFinished
 }

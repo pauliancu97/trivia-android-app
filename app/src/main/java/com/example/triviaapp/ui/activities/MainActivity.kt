@@ -6,10 +6,7 @@ import androidx.activity.compose.setContent
 import androidx.compose.material.MaterialTheme
 import androidx.compose.material.Surface
 import androidx.compose.runtime.Composable
-import androidx.compose.runtime.collectAsState
-import androidx.compose.runtime.getValue
 import androidx.hilt.navigation.compose.hiltViewModel
-import androidx.lifecycle.viewmodel.compose.viewModel
 import androidx.navigation.NavType
 import androidx.navigation.compose.NavHost
 import androidx.navigation.compose.composable
@@ -24,43 +21,34 @@ import com.example.triviaapp.ui.screens.createquiz.CreateQuizSecondScreenViewMod
 import com.example.triviaapp.ui.screens.finishquiz.FinishQuizScreen
 import com.example.triviaapp.ui.screens.playquiz.PlayQuizScreen
 import com.example.triviaapp.ui.screens.playquiz.PlayQuizViewModel
-import com.example.triviaapp.ui.screens.playquiz.PlayQuizViewModelFactory
 import com.example.triviaapp.ui.screens.start.StartScreen
 import com.example.triviaapp.ui.screens.start.StartScreenViewModel
 import com.example.triviaapp.ui.theme.TriviaAppTheme
 import dagger.hilt.android.AndroidEntryPoint
-import javax.inject.Inject
 
 @AndroidEntryPoint
 class MainActivity : ComponentActivity() {
 
-    @Inject
-    lateinit var playQuizViewModelFactory: PlayQuizViewModelFactory
-
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         setContent {
-            TriviaApp(playQuizViewModelFactory)
+            TriviaApp()
         }
     }
 }
 
 @Composable
-fun TriviaApp(
-    playQuizViewModelFactory: PlayQuizViewModelFactory
-) {
+fun TriviaApp() {
     TriviaAppTheme {
         // A surface container using the 'background' color from the theme
         Surface(color = MaterialTheme.colors.background) {
-            TriviaAppNavHost(playQuizViewModelFactory)
+            TriviaAppNavHost()
         }
     }
 }
 
 @Composable
-fun TriviaAppNavHost(
-    playQuizViewModelFactory: PlayQuizViewModelFactory
-) {
+fun TriviaAppNavHost() {
     val navController = rememberNavController()
     NavHost(
         navController = navController,
@@ -119,63 +107,68 @@ fun TriviaAppNavHost(
                 viewModel = viewModel,
                 onNavigateToPlayQuiz = { timeLimit, categoryId, difficultyId, numOfQuestions ->
                     navController.navigate(
-                        "${NavigationDestinations.PlayQuizScreen.name}/$timeLimit/$categoryId/$difficultyId/$numOfQuestions/true"
+                        "${NavigationDestinations.PlayQuizScreen.name}/$timeLimit/true?categoryId=$categoryId&difficultyId=$difficultyId&numOfQuestions=$numOfQuestions"
                     )
                 }
             )
         }
         composable(
-            route = "${NavigationDestinations.PlayQuizScreen.name}/{timeLimit}/{categoryId}/{difficultyId}/{numOfQuestions}/{shouldFetchQuestions}",
+            route = "${NavigationDestinations.PlayQuizScreen.name}/{timeLimit}/{shouldFetchQuestions}?categoryId={categoryId}&difficultyId={difficultyId}&numOfQuestions={numOfQuestions}",
             arguments = listOf(
                 navArgument(
                     name = "timeLimit",
                 ) {
                     type = NavType.IntType
+                    defaultValue = 0
                 },
                 navArgument(
                     name = "categoryId",
                 ) {
                     type = NavType.IntType
+                    defaultValue = 0
                 },
                 navArgument(
                     name = "difficultyId",
                 ) {
                     type = NavType.IntType
+                    defaultValue = 0
                 },
                 navArgument(
                     name = "numOfQuestions",
                 ) {
                     type = NavType.IntType
+                    defaultValue = 0
                 },
                 navArgument(name = "shouldFetchQuestions") {
                     type = NavType.BoolType
+                    defaultValue = true
                 }
             )
         ) {
             val timeLimit = it.arguments?.getInt("timeLimit") ?: 0
-            val categoryId = it.arguments?.getInt("categoryId") ?: 0
+            val categoryId = it.arguments?.getInt("categoryId")
             val difficulty = it.arguments?.getInt("difficultyId")?.let { id -> DifficultyOption.values().getOrNull(id) }
-            val numOfQuestions = it.arguments?.getInt("numOfQuestions") ?: 0
+            val numOfQuestions = it.arguments?.getInt("numOfQuestions")
             val shouldFetchQuestions = it.arguments?.getBoolean("shouldFetchQuestions", true) ?: true
-            val viewModel = viewModel<PlayQuizViewModel>(
-                factory = playQuizViewModelFactory.create(
-                    timeLimit,
-                    categoryId,
-                    difficulty?.toDifficulty(),
-                    numOfQuestions,
-                    shouldFetchQuestions
-                )
+            val viewModel = hiltViewModel<PlayQuizViewModel>()
+            viewModel.initialize(
+                timeLimit, categoryId, difficulty?.toDifficulty(), numOfQuestions, shouldFetchQuestions
             )
             PlayQuizScreen(
                 viewModel,
                 onNavigateToFinishedQuiz = { score, totalScore, numOfCorrectAnswers, numOfQuestions ->
-                    val url = "${NavigationDestinations.FinishedQuizScreen.name}/$score/$totalScore/$numOfCorrectAnswers/$numOfQuestions"
+                    val url = "${NavigationDestinations.FinishedQuizScreen.name}/$score/$totalScore/$numOfCorrectAnswers/$numOfQuestions/$timeLimit"
                     navController.navigate(url)
+                },
+                onNavigateToCreateQuiz = {
+                    navController.navigate(
+                        NavigationDestinations.CreateQuizFirstScreen.name
+                    )
                 }
             )
         }
         composable(
-            route = "${NavigationDestinations.FinishedQuizScreen.name}/{score}/{totalScore}/{numCorrectAnswers}/{numQuestions}",
+            route = "${NavigationDestinations.FinishedQuizScreen.name}/{score}/{totalScore}/{numCorrectAnswers}/{numQuestions}/{timeLimit}",
             arguments = listOf(
                 navArgument(name = "score") {
                     type = NavType.IntType
@@ -188,6 +181,9 @@ fun TriviaAppNavHost(
                 },
                 navArgument(name = "numQuestions") {
                     type = NavType.IntType
+                },
+                navArgument(name = "timeLimit") {
+                    type = NavType.IntType
                 }
             )
         ) { navBackStackEntry ->
@@ -195,13 +191,24 @@ fun TriviaAppNavHost(
             val totalScore = navBackStackEntry.arguments?.getInt("totalScore", 0) ?: 0
             val numOfCorrectAnswers = navBackStackEntry.arguments?.getInt("numCorrectAnswers", 0) ?: 0
             val numOfQuestions = navBackStackEntry.arguments?.getInt("numQuestions", 0) ?: 0
+            val timeLimit = navBackStackEntry.arguments?.getInt("timeLimit", 0) ?: 0
+            val playQuizViewModel = hiltViewModel<PlayQuizViewModel>()
             FinishQuizScreen(
                 score = score,
                 totalScore = totalScore,
                 numOfQuestions = numOfQuestions,
                 numOfCorrectAnswers = numOfCorrectAnswers,
-                onReplayQuiz = {},
-                onCreateNewQuiz = {}
+                onReplayQuiz = {
+                   playQuizViewModel.uninitialised()
+                   navController.navigate(
+                       "${NavigationDestinations.PlayQuizScreen.name}/$timeLimit/false"
+                   )
+                },
+                onCreateNewQuiz = {
+                    navController.navigate(
+                        NavigationDestinations.CreateQuizFirstScreen.name
+                    )
+                }
             )
         }
     }

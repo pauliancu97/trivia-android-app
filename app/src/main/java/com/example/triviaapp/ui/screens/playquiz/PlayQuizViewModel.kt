@@ -1,45 +1,23 @@
 package com.example.triviaapp.ui.screens.playquiz
 
 import androidx.lifecycle.ViewModel
-import androidx.lifecycle.ViewModelProvider
 import androidx.lifecycle.viewModelScope
 import com.example.triviaapp.ui.models.Difficulty
 import com.example.triviaapp.ui.models.Question
 import com.example.triviaapp.ui.repositories.TriviaRepository
 import com.example.triviaapp.ui.utils.update
+import dagger.hilt.android.lifecycle.HiltViewModel
 import kotlinx.coroutines.delay
 import kotlinx.coroutines.flow.*
 import kotlinx.coroutines.launch
 import javax.inject.Inject
 
-class PlayQuizViewModelFactory @Inject constructor(
-    private val triviaRepository: TriviaRepository
-) {
-    fun create(
-        timeLimit: Int,
-        categoryId: Int,
-        difficulty: Difficulty?,
-        numOfQuestions: Int,
-        shouldFetchQuestions: Boolean
-    ) = object : ViewModelProvider.Factory {
-        override fun <T : ViewModel?> create(modelClass: Class<T>): T {
-            return PlayQuizViewModel(
-                triviaRepository, timeLimit, categoryId, difficulty, numOfQuestions,
-                shouldFetchQuestions
-            ) as T
-        }
-    }
-}
 
 typealias OnQuizFinishedCallback = (Int, Int, Int, Int) -> Unit
 
+@HiltViewModel
 class PlayQuizViewModel @Inject constructor(
-    private val triviaRepository: TriviaRepository,
-    private val timeLimit: Int,
-    private val categoryId: Int,
-    private val difficulty: Difficulty?,
-    private val numOfQuestions: Int,
-    private val shouldFetchQuestions: Boolean
+    private val triviaRepository: TriviaRepository
 ): ViewModel() {
 
     private var onQuizFinishedCallback: OnQuizFinishedCallback? = null
@@ -52,6 +30,8 @@ class PlayQuizViewModel @Inject constructor(
 
     private val mutableStateFlow: MutableStateFlow<PlayQuizViewModelState> =
         MutableStateFlow(PlayQuizViewModelState())
+
+    val isQuitQuizDialogShownFlow: Flow<Boolean> = mutableStateFlow.asStateFlow().map { it.isWarningDialogShown }
 
     val uiStateFlow: Flow<PlayQuizUIState> = mutableStateFlow.asStateFlow()
         .map { state ->
@@ -85,39 +65,42 @@ class PlayQuizViewModel @Inject constructor(
             }
         }
 
-    init {
-        mutableStateFlow.value = PlayQuizViewModelState(
-            isLoading = true,
-            timeLimit = timeLimit,
-            timeLeft = timeLimit
-        )
-        viewModelScope.launch {
-            val category = triviaRepository.getCategoryById(categoryId)
-            if (shouldFetchQuestions) {
-                triviaRepository.deleteAllQuestions()
-                triviaRepository.fetchQuestions(
-                    category, difficulty, numOfQuestions
-                )
+    fun initialize(timeLimit: Int, categoryId: Int?, difficulty: Difficulty?, numOfQuestions: Int?, shouldFetchQuestions: Boolean) {
+        if (!mutableStateFlow.value.isInitialized) {
+            mutableStateFlow.value = PlayQuizViewModelState(
+                isInitialized = true,
+                isLoading = true,
+                timeLimit = timeLimit,
+                timeLeft = timeLimit
+            )
+            viewModelScope.launch {
+                if (shouldFetchQuestions) {
+                    val category = categoryId?.let { triviaRepository.getCategoryById(it) }
+                    triviaRepository.deleteAllQuestions()
+                    triviaRepository.fetchQuestions(
+                        category, difficulty, numOfQuestions ?: 0
+                    )
+                }
+                val questions = triviaRepository.getQuestions().shuffled()
+                mutableStateFlow.update {
+                    copy(
+                        questions = questions
+                            .map { question ->
+                                if (question is Question.QuestionMultiple) {
+                                    question.copy(
+                                        answers = question.answers.shuffled()
+                                    )
+                                } else {
+                                    question
+                                }
+                            },
+                        isLoading = false,
+                        totalScore = questions.size * timeLimit
+                    )
+                }
+                initTickerJob()
+                onShowResultListener()
             }
-            val questions = triviaRepository.getQuestions().shuffled()
-            mutableStateFlow.update {
-                copy(
-                    questions = questions
-                        .map { question ->
-                            if (question is Question.QuestionMultiple) {
-                                question.copy(
-                                    answers = question.answers.shuffled()
-                                )
-                            } else {
-                                question
-                            }
-                        },
-                    isLoading = false,
-                    totalScore = numOfQuestions * timeLimit
-                )
-            }
-            initTickerJob()
-            onShowResultListener()
         }
     }
 
@@ -176,19 +159,17 @@ class PlayQuizViewModel @Inject constructor(
                 .filter { it.shouldShowResult() }
                 .collect { currentState ->
                     delay(5000)
-                    if (currentState.currentQuestionIndex + 1 < currentState.questions.size) {
+                    if (mutableStateFlow.value.currentQuestionIndex + 1 < mutableStateFlow.value.questions.size) {
                         mutableStateFlow.update {
-                            currentState.copy(
+                            copy(
                                 currentQuestionIndex = currentState.currentQuestionIndex + 1,
                                 timeLeft = currentState.timeLimit,
                                 selectedBooleanAnswer = null,
                                 selectedStringAnswer = null
                             )
                         }
-                    } else {
-                        mutableStateFlow.update {
-                            currentState.copy(isFinished = true)
-                        }
+                    } else if (!mutableStateFlow.value.isFinished) {
+                        mutableStateFlow.update { currentState.copy(isFinished = true) }
                         onQuizFinishedCallback?.invoke(
                             currentState.score,
                             currentState.totalScore,
@@ -198,5 +179,17 @@ class PlayQuizViewModel @Inject constructor(
                     }
                 }
         }
+    }
+
+    fun updateQuitQuizDialogShownStatus(visible: Boolean) {
+        mutableStateFlow.update { copy(isWarningDialogShown = visible) }
+    }
+
+    fun finish() {
+        mutableStateFlow.update { copy(isFinished = true) }
+    }
+
+    fun uninitialised() {
+        mutableStateFlow.update { copy(isInitialized = false) }
     }
 }
