@@ -1,13 +1,11 @@
 package com.example.triviaapp.ui.screens.playquiz
 
 import androidx.activity.compose.BackHandler
-import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.*
 import androidx.compose.material.*
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.collectAsState
 import androidx.compose.runtime.getValue
-import androidx.compose.runtime.rememberCoroutineScope
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
@@ -17,14 +15,12 @@ import com.example.triviaapp.R
 import com.example.triviaapp.ui.models.Category
 import com.example.triviaapp.ui.models.Difficulty
 import com.example.triviaapp.ui.models.Question
-import kotlinx.coroutines.flow.collect
-import kotlinx.coroutines.launch
 
 @Composable
 fun PlayQuizScreen(
     viewModel: PlayQuizViewModel,
     onNavigateToFinishedQuiz: (Int, Int, Int, Int) -> Unit,
-    onNavigateToCreateQuiz: () -> Unit
+    onNavigateToHomeScreen: () -> Unit
 ) {
     viewModel.setOnQuizFinishedCallback(onNavigateToFinishedQuiz)
     val uiState by viewModel.uiStateFlow.collectAsState(initial = PlayQuizUIState.LoadingState)
@@ -37,7 +33,7 @@ fun PlayQuizScreen(
         onChangeIsQuitQuizDialogShown = { visible -> viewModel.updateQuitQuizDialogShownStatus(visible) },
         onQuitQuiz = {
             viewModel.finish()
-            onNavigateToCreateQuiz()
+            onNavigateToHomeScreen()
         }
     )
 }

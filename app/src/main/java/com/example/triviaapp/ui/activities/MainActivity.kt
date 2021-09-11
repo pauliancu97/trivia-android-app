@@ -158,11 +158,18 @@ fun TriviaAppNavHost() {
                 viewModel,
                 onNavigateToFinishedQuiz = { score, totalScore, numOfCorrectAnswers, numOfQuestions ->
                     val url = "${NavigationDestinations.FinishedQuizScreen.name}/$score/$totalScore/$numOfCorrectAnswers/$numOfQuestions/$timeLimit"
-                    navController.navigate(url)
+                    navController.navigate(url) {
+                        popUpTo(
+                            route = NavigationDestinations.CreateQuizFirstScreen.name
+                        ) {
+                            inclusive = true
+                        }
+                    }
                 },
-                onNavigateToCreateQuiz = {
-                    navController.navigate(
-                        NavigationDestinations.CreateQuizFirstScreen.name
+                onNavigateToHomeScreen = {
+                    navController.popBackStack(
+                        route = NavigationDestinations.StartScreen.name,
+                        inclusive = false
                     )
                 }
             )
@@ -202,12 +209,24 @@ fun TriviaAppNavHost() {
                    playQuizViewModel.uninitialised()
                    navController.navigate(
                        "${NavigationDestinations.PlayQuizScreen.name}/$timeLimit/false"
-                   )
+                   ) {
+                       popUpTo(
+                           route = "${NavigationDestinations.FinishedQuizScreen.name}/{score}/{totalScore}/{numCorrectAnswers}/{numQuestions}/{timeLimit}"
+                       ) {
+                           inclusive = true
+                       }
+                   }
                 },
                 onCreateNewQuiz = {
                     navController.navigate(
                         NavigationDestinations.CreateQuizFirstScreen.name
-                    )
+                    ) {
+                        popUpTo(
+                            route = "${NavigationDestinations.FinishedQuizScreen.name}/{score}/{totalScore}/{numCorrectAnswers}/{numQuestions}/{timeLimit}"
+                        ) {
+                            inclusive = true
+                        }
+                    }
                 }
             )
         }
