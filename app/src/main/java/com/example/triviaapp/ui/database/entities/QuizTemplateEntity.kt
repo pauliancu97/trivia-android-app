@@ -15,7 +15,7 @@ import androidx.room.PrimaryKey
     )]
 )
 data class QuizTemplateEntity(
-    @PrimaryKey(autoGenerate = true) @ColumnInfo(name = ID) val id: Long,
+    @PrimaryKey(autoGenerate = true) @ColumnInfo(name = ID) val id: Long?,
     @ColumnInfo(name = CATEGORY_ID) val categoryId: Int?,
     @ColumnInfo(name = DIFFICULTY_OPTION) val difficultyOption: DifficultyOptionEntity,
     @ColumnInfo(name = NUM_OF_QUESTIONS) val numOfQuestions: Int,

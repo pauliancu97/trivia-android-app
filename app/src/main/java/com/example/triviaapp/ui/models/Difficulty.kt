@@ -24,3 +24,9 @@ enum class Difficulty(val id: Int, val textId: Int) {
     }
 }
 
+fun Difficulty?.toOption() = when (this) {
+    Difficulty.Easy -> DifficultyOption.Easy
+    Difficulty.Medium -> DifficultyOption.Medium
+    Difficulty.Hard -> DifficultyOption.Hard
+    null -> DifficultyOption.Any
+}

@@ -17,7 +17,7 @@ import com.example.triviaapp.ui.database.entities.*
         QuestionBooleanEntity::class,
         QuizTemplateEntity::class
     ],
-    version = 5
+    version = 6
 )
 @TypeConverters(DifficultyConverters::class)
 abstract class TriviaDatabase : RoomDatabase() {

@@ -5,14 +5,12 @@ import com.example.triviaapp.ui.database.TriviaDatabase
 import com.example.triviaapp.ui.database.daos.AnswerDao
 import com.example.triviaapp.ui.database.daos.CategoryDao
 import com.example.triviaapp.ui.database.daos.QuestionDao
+import com.example.triviaapp.ui.database.daos.QuizTemplateDao
 import com.example.triviaapp.ui.database.entities.CategoryEntity
 import com.example.triviaapp.ui.database.entities.QuestionAnswerEntity
 import com.example.triviaapp.ui.database.entities.QuestionBooleanEntity
 import com.example.triviaapp.ui.database.entities.QuestionMultipleEntity
-import com.example.triviaapp.ui.models.Category
-import com.example.triviaapp.ui.models.Difficulty
-import com.example.triviaapp.ui.models.Question
-import com.example.triviaapp.ui.models.QuestionType
+import com.example.triviaapp.ui.models.*
 import com.example.triviaapp.ui.network.models.QuestionResponse
 import com.example.triviaapp.ui.network.services.TriviaService
 import com.example.triviaapp.ui.utils.toModel
@@ -28,6 +26,7 @@ class TriviaRepository @Inject constructor(
     private val categoryDao: CategoryDao,
     private val questionDao: QuestionDao,
     private val answerDao: AnswerDao,
+    private val quizTemplateDao: QuizTemplateDao,
     private val triviaDatabase: TriviaDatabase
 ){
 
@@ -182,6 +181,13 @@ class TriviaRepository @Inject constructor(
             questionDao.deleteAllQuestions()
             answerDao.deleteAll()
         }
+    }
+
+    suspend fun isQuizTemplateWithName(name: String): Boolean =
+        quizTemplateDao.getNumOfQuizTemplatesWithName(name) != 0
+
+    suspend fun saveQuizTemplate(quizTemplate: QuizTemplate) {
+        quizTemplateDao.insert(quizTemplate.toEntity())
     }
 
     private suspend fun QuestionBooleanEntity.toModel() =

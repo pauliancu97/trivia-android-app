@@ -1,18 +1,18 @@
 package com.example.triviaapp.ui.screens.createquiz
 
+import android.widget.Toast
 import androidx.compose.foundation.layout.*
 import androidx.compose.foundation.text.KeyboardActions
 import androidx.compose.foundation.text.KeyboardOptions
-import androidx.compose.material.Button
-import androidx.compose.material.MaterialTheme
-import androidx.compose.material.OutlinedTextField
-import androidx.compose.material.Text
+import androidx.compose.material.*
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.collectAsState
 import androidx.compose.runtime.getValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.scale
+import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.platform.LocalFocusManager
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.input.ImeAction
@@ -20,6 +20,7 @@ import androidx.compose.ui.text.input.KeyboardType
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import com.example.triviaapp.R
+import kotlinx.coroutines.flow.collect
 import java.io.FileDescriptor
 
 @Composable
@@ -29,6 +30,18 @@ fun CreateQuizSecondScreen(
 ) {
     val state by viewModel.stateFlow.collectAsState(CreateQuizSecondScreenState())
     val isSaveAsTemplateEnabled by viewModel.isSaveAsTemplateEnabledFlow.collectAsState(false)
+    val saveTemplateDialogState by viewModel.saveTemplateDialogStateFlow.collectAsState(SaveQuizTemplateDialogState.Hidden)
+    val context = LocalContext.current
+    LaunchedEffect(Unit) {
+        viewModel.showSavedTemplateEventFlow
+            .collect {
+                Toast.makeText(
+                    context,
+                    R.string.quiz_template_saved,
+                    Toast.LENGTH_LONG
+                )
+            }
+    }
     CreateQuizSecondScreen(
         numOfQuestions = state.numOfQuestions,
         onNumOfQuestionsChanged = { num -> viewModel.updateNumOfQuestions(num) },
@@ -51,8 +64,12 @@ fun CreateQuizSecondScreen(
           },
         numQuestionsErrorState = state.numOfQuestionsErrorState,
         timeLimitErrorState = state.timeLimitErrorState,
-        onSaveAsTemplate = {},
-        isSaveAsTemplateEnabled = isSaveAsTemplateEnabled
+        onSaveAsTemplate = { viewModel.showSaveTemplateDialog() },
+        isSaveAsTemplateEnabled = isSaveAsTemplateEnabled,
+        saveAsTemplateDialogState = saveTemplateDialogState,
+        onDismissSaveAsTemplate = { viewModel.hideSaveQuizAsTemplate() },
+        onSaveTemplate = { viewModel.onSaveQuizTemplate() },
+        onTemplateNameChange = { viewModel.updateTemplateName(it) }
     )
 }
 
@@ -70,7 +87,11 @@ fun CreateQuizSecondScreen(
     numQuestionsErrorState: FieldErrorState = FieldErrorState.None,
     timeLimitErrorState: FieldErrorState = FieldErrorState.None,
     onSaveAsTemplate: () -> Unit,
-    isSaveAsTemplateEnabled: Boolean
+    isSaveAsTemplateEnabled: Boolean,
+    saveAsTemplateDialogState: SaveQuizTemplateDialogState,
+    onDismissSaveAsTemplate: () -> Unit,
+    onSaveTemplate: () -> Unit,
+    onTemplateNameChange: (String) -> Unit
 ) {
     val focusManager = LocalFocusManager.current
     Column(
@@ -193,6 +214,50 @@ fun CreateQuizSecondScreen(
             Text(text = stringResource(R.string.save_as_quiz_template))
         }
     }
+    if (saveAsTemplateDialogState is SaveQuizTemplateDialogState.Shown) {
+        AlertDialog(
+            onDismissRequest = onDismissSaveAsTemplate,
+            title = {
+                Text(
+                    text = stringResource(R.string.save_as_quiz_template),
+                    style = MaterialTheme.typography.h5
+                )
+            },
+            text = {
+                Column {
+                    Text(
+                        text = stringResource(R.string.message_save_template),
+                        style = MaterialTheme.typography.body1
+                    )
+                    OutlinedTextField(
+                        value = saveAsTemplateDialogState.name ?: "",
+                        onValueChange = onTemplateNameChange
+                    )
+                    saveAsTemplateDialogState.error?.let { error ->
+                        val errorMessage = when (error) {
+                            TemplateNameError.Empty -> stringResource(R.string.quiz_template_empty)
+                            TemplateNameError.AlreadyExists -> stringResource(R.string.quiz_template_exists)
+                        }
+                        Text(
+                            text = errorMessage,
+                            style = MaterialTheme.typography.subtitle2,
+                            color = MaterialTheme.colors.error
+                        )
+                    }
+                }
+            },
+            confirmButton = {
+                TextButton(onClick = onSaveTemplate) {
+                    Text(text = stringResource(R.string.ok))
+                }
+            },
+            dismissButton = {
+                TextButton(onClick = onDismissSaveAsTemplate) {
+                    Text(text = stringResource(R.string.cancel))
+                }
+            }
+        )
+    }
 }
 
 @Composable
@@ -209,6 +274,10 @@ fun PreviewCreateQuizSecondScreen() {
         maxTimeLimit = 60,
         onPlayClick = {},
         onSaveAsTemplate = {},
-        isSaveAsTemplateEnabled = true
+        isSaveAsTemplateEnabled = true,
+        saveAsTemplateDialogState = SaveQuizTemplateDialogState.Hidden,
+        onDismissSaveAsTemplate = {},
+        onSaveTemplate = {},
+        onTemplateNameChange = {}
     )
 }

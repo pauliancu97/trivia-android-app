@@ -6,6 +6,7 @@ import com.example.triviaapp.ui.database.TriviaDatabase
 import com.example.triviaapp.ui.database.daos.AnswerDao
 import com.example.triviaapp.ui.database.daos.CategoryDao
 import com.example.triviaapp.ui.database.daos.QuestionDao
+import com.example.triviaapp.ui.database.daos.QuizTemplateDao
 import dagger.Module
 import dagger.Provides
 import dagger.hilt.InstallIn
@@ -28,6 +29,10 @@ class DatabaseModule {
     @Provides
     fun provideAnswerDao(triviaDatabase: TriviaDatabase): AnswerDao =
         triviaDatabase.answerDao()
+
+    @Provides
+    fun providerQuizTemplateDao(triviaDatabase: TriviaDatabase): QuizTemplateDao =
+        triviaDatabase.quizTemplateDao()
 
     @Provides
     @Singleton

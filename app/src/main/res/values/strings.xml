@@ -32,4 +32,10 @@
     <string name="yes">Yes</string>
     <string name="no">No</string>
     <string name="save_as_quiz_template">Save as quiz template</string>
+    <string name="ok">Ok</string>
+    <string name="cancel">Cancel</string>
+    <string name="message_save_template">Please enter a name for the quiz template</string>
+    <string name="quiz_template_saved">Quiz template saved!</string>
+    <string name="quiz_template_empty">Quiz template name can\'t be empty</string>
+    <string name="quiz_template_exists">A quiz template with the same name already exists</string>
 </resources>
