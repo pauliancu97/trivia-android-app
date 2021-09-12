@@ -11,6 +11,7 @@ import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.asStateFlow
+import kotlinx.coroutines.flow.map
 import kotlinx.coroutines.launch
 import kotlinx.coroutines.withContext
 import javax.inject.Inject
@@ -44,6 +45,13 @@ class CreateQuizSecondScreenViewModel @Inject constructor(
         MutableStateFlow(CreateQuizSecondScreenState())
 
     val stateFlow: Flow<CreateQuizSecondScreenState> = mutableStateFlow.asStateFlow()
+
+    val isSaveAsTemplateEnabledFlow: Flow<Boolean> =
+        stateFlow
+            .map { state ->
+                (state.numOfQuestions?.let { it in state.minNumOfQuestions..state.maxNumOfQuestions } ?: false) &&
+                        (state.timeLimit?.let { it in state.minTimeLimit..state.maxTimeLimit } ?: false)
+            }
 
     fun initialize(categoryId: Int, difficulty: Difficulty?, maxNumOfQuestions: Int) {
         viewModelScope.launch {

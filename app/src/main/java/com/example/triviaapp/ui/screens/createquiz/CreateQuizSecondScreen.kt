@@ -28,6 +28,7 @@ fun CreateQuizSecondScreen(
     onNavigateToPlayQuiz: (Int, Int, Int, Int) -> Unit
 ) {
     val state by viewModel.stateFlow.collectAsState(CreateQuizSecondScreenState())
+    val isSaveAsTemplateEnabled by viewModel.isSaveAsTemplateEnabledFlow.collectAsState(false)
     CreateQuizSecondScreen(
         numOfQuestions = state.numOfQuestions,
         onNumOfQuestionsChanged = { num -> viewModel.updateNumOfQuestions(num) },
@@ -49,7 +50,9 @@ fun CreateQuizSecondScreen(
             }
           },
         numQuestionsErrorState = state.numOfQuestionsErrorState,
-        timeLimitErrorState = state.timeLimitErrorState
+        timeLimitErrorState = state.timeLimitErrorState,
+        onSaveAsTemplate = {},
+        isSaveAsTemplateEnabled = isSaveAsTemplateEnabled
     )
 }
 
@@ -65,7 +68,9 @@ fun CreateQuizSecondScreen(
     maxTimeLimit: Int,
     onPlayClick: () -> Unit,
     numQuestionsErrorState: FieldErrorState = FieldErrorState.None,
-    timeLimitErrorState: FieldErrorState = FieldErrorState.None
+    timeLimitErrorState: FieldErrorState = FieldErrorState.None,
+    onSaveAsTemplate: () -> Unit,
+    isSaveAsTemplateEnabled: Boolean
 ) {
     val focusManager = LocalFocusManager.current
     Column(
@@ -178,6 +183,15 @@ fun CreateQuizSecondScreen(
         ) {
             Text(text = stringResource(R.string.play))
         }
+        Button(
+            onClick = onSaveAsTemplate,
+            enabled = isSaveAsTemplateEnabled,
+            modifier = Modifier
+                .fillMaxWidth()
+                .padding(5.dp)
+        ) {
+            Text(text = stringResource(R.string.save_as_quiz_template))
+        }
     }
 }
 
@@ -193,6 +207,8 @@ fun PreviewCreateQuizSecondScreen() {
         onTimeLimitChanged = {},
         minTimeLimit = 5,
         maxTimeLimit = 60,
-        onPlayClick = {}
+        onPlayClick = {},
+        onSaveAsTemplate = {},
+        isSaveAsTemplateEnabled = true
     )
 }
