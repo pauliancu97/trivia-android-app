@@ -12,6 +12,7 @@ import androidx.navigation.compose.NavHost
 import androidx.navigation.compose.composable
 import androidx.navigation.compose.navArgument
 import androidx.navigation.compose.rememberNavController
+import com.example.triviaapp.ui.animations.EnterFromRightAnimation
 import com.example.triviaapp.ui.models.DifficultyOption
 import com.example.triviaapp.ui.navigation.NavigationDestinations
 import com.example.triviaapp.ui.screens.createquiz.CreateQuizFirstScreen
@@ -65,14 +66,16 @@ fun TriviaAppNavHost() {
         }
         composable(NavigationDestinations.CreateQuizFirstScreen.name) {
             val viewModel = hiltViewModel<CreateQuizFirstScreenViewModel>()
-            CreateQuizFirstScreen(
-                viewModel,
-                onNavigateToCreateQuizSecondScreen = { categoryId, difficulty, numQuestions ->
-                    navController.navigate(
-                        "${NavigationDestinations.CreateQuizSecondScreen}?categoryId=$categoryId&difficulty=$difficulty&numQuestions=$numQuestions"
-                    )
-                }
-            )
+            EnterFromRightAnimation {
+                CreateQuizFirstScreen(
+                    viewModel,
+                    onNavigateToCreateQuizSecondScreen = { categoryId, difficulty, numQuestions ->
+                        navController.navigate(
+                            "${NavigationDestinations.CreateQuizSecondScreen}?categoryId=$categoryId&difficulty=$difficulty&numQuestions=$numQuestions"
+                        )
+                    }
+                )
+            }
         }
         composable(
             "${NavigationDestinations.CreateQuizSecondScreen}?categoryId={categoryId}&difficulty={difficulty}&numQuestions={numQuestions}",
@@ -103,14 +106,16 @@ fun TriviaAppNavHost() {
             val maxNumOfQuestions = navBackStackEntry.arguments?.getInt("numQuestions") ?: 0
             val viewModel = hiltViewModel<CreateQuizSecondScreenViewModel>()
             viewModel.initialize(categoryId, difficulty, maxNumOfQuestions)
-            CreateQuizSecondScreen(
-                viewModel = viewModel,
-                onNavigateToPlayQuiz = { timeLimit, categoryId, difficultyId, numOfQuestions ->
-                    navController.navigate(
-                        "${NavigationDestinations.PlayQuizScreen.name}/$timeLimit/true?categoryId=$categoryId&difficultyId=$difficultyId&numOfQuestions=$numOfQuestions"
-                    )
-                }
-            )
+            EnterFromRightAnimation {
+                CreateQuizSecondScreen(
+                    viewModel = viewModel,
+                    onNavigateToPlayQuiz = { timeLimit, categoryId, difficultyId, numOfQuestions ->
+                        navController.navigate(
+                            "${NavigationDestinations.PlayQuizScreen.name}/$timeLimit/true?categoryId=$categoryId&difficultyId=$difficultyId&numOfQuestions=$numOfQuestions"
+                        )
+                    }
+                )
+            }
         }
         composable(
             route = "${NavigationDestinations.PlayQuizScreen.name}/{timeLimit}/{shouldFetchQuestions}?categoryId={categoryId}&difficultyId={difficultyId}&numOfQuestions={numOfQuestions}",
@@ -154,25 +159,27 @@ fun TriviaAppNavHost() {
             viewModel.initialize(
                 timeLimit, categoryId, difficulty?.toDifficulty(), numOfQuestions, shouldFetchQuestions
             )
-            PlayQuizScreen(
-                viewModel,
-                onNavigateToFinishedQuiz = { score, totalScore, numOfCorrectAnswers, numOfQuestions ->
-                    val url = "${NavigationDestinations.FinishedQuizScreen.name}/$score/$totalScore/$numOfCorrectAnswers/$numOfQuestions/$timeLimit"
-                    navController.navigate(url) {
-                        popUpTo(
-                            route = NavigationDestinations.CreateQuizFirstScreen.name
-                        ) {
-                            inclusive = true
+            EnterFromRightAnimation {
+                PlayQuizScreen(
+                    viewModel,
+                    onNavigateToFinishedQuiz = { score, totalScore, numOfCorrectAnswers, numOfQuestions ->
+                        val url = "${NavigationDestinations.FinishedQuizScreen.name}/$score/$totalScore/$numOfCorrectAnswers/$numOfQuestions/$timeLimit"
+                        navController.navigate(url) {
+                            popUpTo(
+                                route = NavigationDestinations.CreateQuizFirstScreen.name
+                            ) {
+                                inclusive = true
+                            }
                         }
+                    },
+                    onNavigateToHomeScreen = {
+                        navController.popBackStack(
+                            route = NavigationDestinations.StartScreen.name,
+                            inclusive = false
+                        )
                     }
-                },
-                onNavigateToHomeScreen = {
-                    navController.popBackStack(
-                        route = NavigationDestinations.StartScreen.name,
-                        inclusive = false
-                    )
-                }
-            )
+                )
+            }
         }
         composable(
             route = "${NavigationDestinations.FinishedQuizScreen.name}/{score}/{totalScore}/{numCorrectAnswers}/{numQuestions}/{timeLimit}",
@@ -200,35 +207,37 @@ fun TriviaAppNavHost() {
             val numOfQuestions = navBackStackEntry.arguments?.getInt("numQuestions", 0) ?: 0
             val timeLimit = navBackStackEntry.arguments?.getInt("timeLimit", 0) ?: 0
             val playQuizViewModel = hiltViewModel<PlayQuizViewModel>()
-            FinishQuizScreen(
-                score = score,
-                totalScore = totalScore,
-                numOfQuestions = numOfQuestions,
-                numOfCorrectAnswers = numOfCorrectAnswers,
-                onReplayQuiz = {
-                   playQuizViewModel.uninitialised()
-                   navController.navigate(
-                       "${NavigationDestinations.PlayQuizScreen.name}/$timeLimit/false"
-                   ) {
-                       popUpTo(
-                           route = "${NavigationDestinations.FinishedQuizScreen.name}/{score}/{totalScore}/{numCorrectAnswers}/{numQuestions}/{timeLimit}"
-                       ) {
-                           inclusive = true
-                       }
-                   }
-                },
-                onCreateNewQuiz = {
-                    navController.navigate(
-                        NavigationDestinations.CreateQuizFirstScreen.name
-                    ) {
-                        popUpTo(
-                            route = "${NavigationDestinations.FinishedQuizScreen.name}/{score}/{totalScore}/{numCorrectAnswers}/{numQuestions}/{timeLimit}"
+            EnterFromRightAnimation {
+                FinishQuizScreen(
+                    score = score,
+                    totalScore = totalScore,
+                    numOfQuestions = numOfQuestions,
+                    numOfCorrectAnswers = numOfCorrectAnswers,
+                    onReplayQuiz = {
+                        playQuizViewModel.uninitialised()
+                        navController.navigate(
+                            "${NavigationDestinations.PlayQuizScreen.name}/$timeLimit/false"
                         ) {
-                            inclusive = true
+                            popUpTo(
+                                route = "${NavigationDestinations.FinishedQuizScreen.name}/{score}/{totalScore}/{numCorrectAnswers}/{numQuestions}/{timeLimit}"
+                            ) {
+                                inclusive = true
+                            }
+                        }
+                    },
+                    onCreateNewQuiz = {
+                        navController.navigate(
+                            NavigationDestinations.CreateQuizFirstScreen.name
+                        ) {
+                            popUpTo(
+                                route = "${NavigationDestinations.FinishedQuizScreen.name}/{score}/{totalScore}/{numCorrectAnswers}/{numQuestions}/{timeLimit}"
+                            ) {
+                                inclusive = true
+                            }
                         }
                     }
-                }
-            )
+                )
+            }
         }
     }
 }

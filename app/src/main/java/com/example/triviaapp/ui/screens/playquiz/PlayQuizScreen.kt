@@ -1,6 +1,8 @@
 package com.example.triviaapp.ui.screens.playquiz
 
 import androidx.activity.compose.BackHandler
+import androidx.compose.animation.Crossfade
+import androidx.compose.animation.core.tween
 import androidx.compose.foundation.layout.*
 import androidx.compose.material.*
 import androidx.compose.runtime.Composable
@@ -12,6 +14,7 @@ import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.tooling.preview.Preview
 import com.example.triviaapp.R
+import com.example.triviaapp.ui.animations.AnimateQuestionContent
 import com.example.triviaapp.ui.models.Category
 import com.example.triviaapp.ui.models.Difficulty
 import com.example.triviaapp.ui.models.Question
@@ -49,14 +52,32 @@ fun PlayQuizScreen(
 ) {
     when (state) {
         PlayQuizUIState.LoadingState -> PlayQuizScreenLoading()
-        is PlayQuizUIState.QuizQuestionState.QuizMultiple -> PlayQuizShowQuestionMultipleScreen(
-            questionState = state,
-            onSelectAnswer = onSelectedStringAnswer
-        )
-        is PlayQuizUIState.QuizQuestionState.QuizBoolean -> PlayQuizShowQuestionBooleanScreen(
-            questionState = state,
-            onSelectAnswer = onSelectedBooleanAnswer
-        )
+        is PlayQuizUIState.QuizQuestionState.QuizMultiple -> {
+            Column {
+                PlayQuizSHowQuestionScreenHeader(state)
+                AnimateQuestionContent(
+                    state = state.question.text
+                ) {
+                    PlayQuizShowQuestionMultipleScreen(
+                        questionState = state,
+                        onSelectAnswer = onSelectedStringAnswer
+                    )
+                }
+            }
+        }
+        is PlayQuizUIState.QuizQuestionState.QuizBoolean -> {
+            Column {
+                PlayQuizSHowQuestionScreenHeader(state)
+                AnimateQuestionContent(
+                    state = state.question.text
+                ) {
+                    PlayQuizShowQuestionBooleanScreen(
+                        questionState = state,
+                        onSelectAnswer = onSelectedBooleanAnswer
+                    )
+                }
+            }
+        }
     }
     BackHandler(
         onBack = { onChangeIsQuitQuizDialogShown(true) }
@@ -99,11 +120,10 @@ fun PlayQuizScreenLoading() {
 }
 
 @Composable
-fun PlayQuizShowQuestionScreen(questionState: PlayQuizUIState.QuizQuestionState) {
-    Column(
-        modifier = Modifier
-            .fillMaxWidth()
-    ) {
+fun PlayQuizSHowQuestionScreenHeader(
+    questionState: PlayQuizUIState.QuizQuestionState
+) {
+    Column(modifier = Modifier.fillMaxWidth()) {
         Text(
             text = stringResource(
                 R.string.question_out_of,
@@ -133,6 +153,15 @@ fun PlayQuizShowQuestionScreen(questionState: PlayQuizUIState.QuizQuestionState)
                 alignment = Alignment.CenterHorizontally
             )
         )
+    }
+}
+
+@Composable
+fun PlayQuizShowQuestionScreen(questionState: PlayQuizUIState.QuizQuestionState) {
+    Column(
+        modifier = Modifier
+            .fillMaxWidth()
+    ) {
         Row(
             modifier = Modifier.fillMaxWidth()
         ) {
@@ -262,6 +291,36 @@ fun PlayQuizShowQuestionBooleanScreen(
             }
         }
     }
+}
+
+@Composable
+@Preview
+fun PreviewPlayQuizShowQuestionHeader() {
+    PlayQuizSHowQuestionScreenHeader(questionState =
+    PlayQuizUIState.QuizQuestionState.QuizBoolean(
+        questionIndex = 1,
+        numOfQuestions = 15,
+        question = Question.QuestionBoolean(
+            text = "Was Lincoln the 4th president of the US?",
+            category = Category(
+                id = 1,
+                name = "History",
+                numOfQuestions = 100,
+                numOfEasyQuestions = 12,
+                numOfMediumQuestions = 28,
+                numOfHardQuestions = 60
+            ),
+            difficulty = Difficulty.Medium,
+            correctAnswer = true
+        ),
+        timeLimit = 15,
+        timeLeft = 8,
+        selectedAnswer = null,
+        score = 3,
+        totalScore = 34,
+        correctAnswers = 1
+    )
+    )
 }
 
 @Composable
