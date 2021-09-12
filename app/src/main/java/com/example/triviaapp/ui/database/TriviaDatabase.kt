@@ -6,21 +6,20 @@ import androidx.room.TypeConverters
 import com.example.triviaapp.ui.database.daos.AnswerDao
 import com.example.triviaapp.ui.database.daos.CategoryDao
 import com.example.triviaapp.ui.database.daos.QuestionDao
-import com.example.triviaapp.ui.database.entities.CategoryEntity
-import com.example.triviaapp.ui.database.entities.QuestionAnswerEntity
-import com.example.triviaapp.ui.database.entities.QuestionBooleanEntity
-import com.example.triviaapp.ui.database.entities.QuestionMultipleEntity
+import com.example.triviaapp.ui.database.daos.QuizTemplateDao
+import com.example.triviaapp.ui.database.entities.*
 
 @Database(
     entities = [
         CategoryEntity::class,
         QuestionMultipleEntity::class,
         QuestionAnswerEntity::class,
-        QuestionBooleanEntity::class
+        QuestionBooleanEntity::class,
+        QuizTemplateEntity::class
     ],
-    version = 4
+    version = 5
 )
-@TypeConverters(Converters::class)
+@TypeConverters(DifficultyConverters::class)
 abstract class TriviaDatabase : RoomDatabase() {
 
     abstract fun categoryDao(): CategoryDao
@@ -28,6 +27,8 @@ abstract class TriviaDatabase : RoomDatabase() {
     abstract fun questionDao(): QuestionDao
 
     abstract fun answerDao(): AnswerDao
+
+    abstract fun quizTemplateDao(): QuizTemplateDao
 
     companion object {
         const val DATABASE_NAME = "trivia_database"
