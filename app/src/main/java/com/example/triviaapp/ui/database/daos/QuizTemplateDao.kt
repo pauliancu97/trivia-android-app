@@ -19,4 +19,7 @@ interface QuizTemplateDao {
 
     @Query("SELECT COUNT(*) FROM ${QuizTemplateEntity.TABLE_NAME} WHERE name = :name")
     suspend fun getNumOfQuizTemplatesWithName(name: String): Int
+
+    @Query("UPDATE ${QuizTemplateEntity.TABLE_NAME} SET ${QuizTemplateEntity.NAME} = :name WHERE ${QuizTemplateEntity.ID} = :id")
+    suspend fun updateQuizTemplateName(id: Long, name: String)
 }

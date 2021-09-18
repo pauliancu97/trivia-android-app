@@ -190,6 +190,10 @@ class TriviaRepository @Inject constructor(
         quizTemplateDao.insert(quizTemplate.toEntity())
     }
 
+    suspend fun updateQuizTemplateName(id: Long, name: String) {
+        quizTemplateDao.updateQuizTemplateName(id, name)
+    }
+
     private suspend fun QuestionBooleanEntity.toModel() =
         Question.QuestionBoolean(
             text = this.text,
