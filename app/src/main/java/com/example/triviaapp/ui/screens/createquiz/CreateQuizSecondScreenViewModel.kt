@@ -65,10 +65,10 @@ class CreateQuizSecondScreenViewModel @Inject constructor(
 
     val saveTemplateDialogStateFlow: Flow<SaveQuizTemplateDialogState> = mutableSaveTemplateDialogState.asStateFlow()
 
-    private val mutableShowSavedTemplateEvent: MutableSharedFlow<Unit> =
+    private val mutableShowSavedTemplateEvent: MutableSharedFlow<String> =
         MutableSharedFlow()
 
-    val showSavedTemplateEventFlow: Flow<Unit> = mutableShowSavedTemplateEvent.asSharedFlow()
+    val showSavedTemplateEventFlow: Flow<String> = mutableShowSavedTemplateEvent.asSharedFlow()
 
     val isSaveAsTemplateEnabledFlow: Flow<Boolean> =
         stateFlow
@@ -157,33 +157,34 @@ class CreateQuizSecondScreenViewModel @Inject constructor(
         }
     }
 
-    fun onSaveQuizTemplate() {
-        viewModelScope.launch {
-            val state = (mutableSaveTemplateDialogState.value as? SaveQuizTemplateDialogState.Shown) ?: return@launch
-            if (state.name.isNullOrBlank()) {
-                mutableSaveTemplateDialogState.update {
-                    state.copy(error = TemplateNameError.Empty)
-                }
-            } else if (withContext(Dispatchers.IO) { triviaRepository.isQuizTemplateWithName(state.name) }) {
-                mutableSaveTemplateDialogState.update {
-                    state.copy(error = TemplateNameError.AlreadyExists)
-                }
-            } else {
-                withContext(Dispatchers.IO) {
-                    triviaRepository.saveQuizTemplate(
-                        QuizTemplate(
-                            name = state.name,
-                            categoryName = mutableStateFlow.value.category?.name,
-                            categoryId = mutableStateFlow.value.category?.id,
-                            difficultyOption = mutableStateFlow.value.difficulty.toOption(),
-                            numOfQuestions = mutableStateFlow.value.numOfQuestions ?: 0,
-                            timeLimit = mutableStateFlow.value.timeLimit ?: 0
-                        )
-                    )
-                }
-                mutableSaveTemplateDialogState.update { SaveQuizTemplateDialogState.Hidden }
-                mutableShowSavedTemplateEvent.emit(Unit)
+    suspend fun onSaveQuizTemplate(): String? {
+        val state = (mutableSaveTemplateDialogState.value as? SaveQuizTemplateDialogState.Shown) ?: return null
+        return if (state.name.isNullOrBlank()) {
+            mutableSaveTemplateDialogState.update {
+                state.copy(error = TemplateNameError.Empty)
             }
+            null
+        } else if (withContext(Dispatchers.IO) { triviaRepository.isQuizTemplateWithName(state.name) }) {
+            mutableSaveTemplateDialogState.update {
+                state.copy(error = TemplateNameError.AlreadyExists)
+            }
+            null
+        } else {
+            withContext(Dispatchers.IO) {
+                triviaRepository.saveQuizTemplate(
+                    QuizTemplate(
+                        name = state.name,
+                        categoryName = mutableStateFlow.value.category?.name,
+                        categoryId = mutableStateFlow.value.category?.id,
+                        difficultyOption = mutableStateFlow.value.difficulty.toOption(),
+                        numOfQuestions = mutableStateFlow.value.numOfQuestions ?: 0,
+                        timeLimit = mutableStateFlow.value.timeLimit ?: 0
+                    )
+                )
+            }
+            mutableSaveTemplateDialogState.update { SaveQuizTemplateDialogState.Hidden }
+            mutableShowSavedTemplateEvent.emit(state.name)
+            state.name
         }
     }
 

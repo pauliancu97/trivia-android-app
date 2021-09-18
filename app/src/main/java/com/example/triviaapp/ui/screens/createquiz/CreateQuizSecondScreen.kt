@@ -5,10 +5,7 @@ import androidx.compose.foundation.layout.*
 import androidx.compose.foundation.text.KeyboardActions
 import androidx.compose.foundation.text.KeyboardOptions
 import androidx.compose.material.*
-import androidx.compose.runtime.Composable
-import androidx.compose.runtime.LaunchedEffect
-import androidx.compose.runtime.collectAsState
-import androidx.compose.runtime.getValue
+import androidx.compose.runtime.*
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.scale
@@ -21,6 +18,8 @@ import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import com.example.triviaapp.R
 import kotlinx.coroutines.flow.collect
+import kotlinx.coroutines.launch
+import timber.log.Timber
 import java.io.FileDescriptor
 
 @Composable
@@ -31,46 +30,56 @@ fun CreateQuizSecondScreen(
     val state by viewModel.stateFlow.collectAsState(CreateQuizSecondScreenState())
     val isSaveAsTemplateEnabled by viewModel.isSaveAsTemplateEnabledFlow.collectAsState(false)
     val saveTemplateDialogState by viewModel.saveTemplateDialogStateFlow.collectAsState(SaveQuizTemplateDialogState.Hidden)
+    val scaffoldState = rememberScaffoldState()
+    val scope = rememberCoroutineScope()
     val context = LocalContext.current
-    LaunchedEffect(Unit) {
-        viewModel.showSavedTemplateEventFlow
-            .collect {
-                Toast.makeText(
-                    context,
-                    R.string.quiz_template_saved,
-                    Toast.LENGTH_LONG
-                )
-            }
+    Scaffold(
+        scaffoldState = scaffoldState
+    ) {
+        CreateQuizSecondScreen(
+            numOfQuestions = state.numOfQuestions,
+            onNumOfQuestionsChanged = { num -> viewModel.updateNumOfQuestions(num) },
+            minNumOfQuestions = state.minNumOfQuestions,
+            maxNumOfQuestions = state.maxNumOfQuestions,
+            timeLimit = state.timeLimit,
+            onTimeLimitChanged = { num -> viewModel.updateTimeLimit(num) },
+            minTimeLimit = state.minTimeLimit,
+            maxTimeLimit = state.maxTimeLimit,
+            onPlayClick = {
+                val isValid = viewModel.onPlayClick()
+                if (isValid) {
+                    onNavigateToPlayQuiz(
+                        state.timeLimit ?: 0,
+                        state.category?.id ?: 0,
+                        state.difficulty?.ordinal?.plus(1) ?: 0,
+                        state.numOfQuestions ?: 0
+                    )
+                }
+            },
+            numQuestionsErrorState = state.numOfQuestionsErrorState,
+            timeLimitErrorState = state.timeLimitErrorState,
+            onSaveAsTemplate = { viewModel.showSaveTemplateDialog() },
+            isSaveAsTemplateEnabled = isSaveAsTemplateEnabled,
+            saveAsTemplateDialogState = saveTemplateDialogState,
+            onDismissSaveAsTemplate = { viewModel.hideSaveQuizAsTemplate() },
+            onSaveTemplate = {
+                 scope.launch {
+                     val savedQuizTemplateName = viewModel.onSaveQuizTemplate()
+                     if (savedQuizTemplateName != null) {
+                         val snackbarMessage = context.resources.getString(
+                             R.string.saved_template_text,
+                             savedQuizTemplateName
+                         )
+                         scaffoldState.snackbarHostState.showSnackbar(
+                             snackbarMessage,
+                             duration = SnackbarDuration.Short
+                         )
+                     }
+                 }
+            },
+            onTemplateNameChange = { viewModel.updateTemplateName(it) }
+        )
     }
-    CreateQuizSecondScreen(
-        numOfQuestions = state.numOfQuestions,
-        onNumOfQuestionsChanged = { num -> viewModel.updateNumOfQuestions(num) },
-        minNumOfQuestions = state.minNumOfQuestions,
-        maxNumOfQuestions = state.maxNumOfQuestions,
-        timeLimit = state.timeLimit,
-        onTimeLimitChanged = { num -> viewModel.updateTimeLimit(num) },
-        minTimeLimit = state.minTimeLimit,
-        maxTimeLimit = state.maxTimeLimit,
-        onPlayClick = {
-            val isValid = viewModel.onPlayClick()
-            if (isValid) {
-                onNavigateToPlayQuiz(
-                    state.timeLimit ?: 0,
-                    state.category?.id ?: 0,
-                    state.difficulty?.ordinal?.plus(1) ?: 0,
-                    state.numOfQuestions ?: 0
-                )
-            }
-          },
-        numQuestionsErrorState = state.numOfQuestionsErrorState,
-        timeLimitErrorState = state.timeLimitErrorState,
-        onSaveAsTemplate = { viewModel.showSaveTemplateDialog() },
-        isSaveAsTemplateEnabled = isSaveAsTemplateEnabled,
-        saveAsTemplateDialogState = saveTemplateDialogState,
-        onDismissSaveAsTemplate = { viewModel.hideSaveQuizAsTemplate() },
-        onSaveTemplate = { viewModel.onSaveQuizTemplate() },
-        onTemplateNameChange = { viewModel.updateTemplateName(it) }
-    )
 }
 
 @Composable

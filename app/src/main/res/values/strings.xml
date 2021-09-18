@@ -38,4 +38,5 @@
     <string name="quiz_template_saved">Quiz template saved!</string>
     <string name="quiz_template_empty">Quiz template name can\'t be empty</string>
     <string name="quiz_template_exists">A quiz template with the same name already exists</string>
+    <string name="saved_template_text">Saved \"%1$s\" quiz template</string>
 </resources>
