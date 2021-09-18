@@ -39,4 +39,8 @@
     <string name="quiz_template_empty">Quiz template name can\'t be empty</string>
     <string name="quiz_template_exists">A quiz template with the same name already exists</string>
     <string name="saved_template_text">Saved \"%1$s\" quiz template</string>
+    <string name="rename_quiz_template">Rename quiz template</string>
+    <string name="rename_quiz_template_message">Please enter a new name for this quiz template</string>
+    <string name="quiz_template_not_renamed">Entered name is not different from the current name</string>\
+    <string name="renamed_quiz_template">Renamed quiz template to \"%1$d\"</string>
 </resources>

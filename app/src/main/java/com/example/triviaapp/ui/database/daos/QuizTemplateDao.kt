@@ -22,4 +22,7 @@ interface QuizTemplateDao {
 
     @Query("UPDATE ${QuizTemplateEntity.TABLE_NAME} SET ${QuizTemplateEntity.NAME} = :name WHERE ${QuizTemplateEntity.ID} = :id")
     suspend fun updateQuizTemplateName(id: Long, name: String)
+
+    @Query("SELECT ${QuizTemplateEntity.ID} FROM ${QuizTemplateEntity.TABLE_NAME} WHERE ${QuizTemplateEntity.NAME} = :name")
+    suspend fun getQuizTemplatesIdsWithName(name: String): List<Long>
 }

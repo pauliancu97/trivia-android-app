@@ -13,6 +13,7 @@ import androidx.navigation.compose.composable
 import androidx.navigation.compose.navArgument
 import androidx.navigation.compose.rememberNavController
 import com.example.triviaapp.ui.animations.EnterFromRightAnimation
+import com.example.triviaapp.ui.dialogs.QuizTemplateDialogViewModel
 import com.example.triviaapp.ui.models.DifficultyOption
 import com.example.triviaapp.ui.navigation.NavigationDestinations
 import com.example.triviaapp.ui.screens.createquiz.CreateQuizFirstScreen
@@ -105,10 +106,12 @@ fun TriviaAppNavHost() {
                 ?.let { DifficultyOption.valueOf(it) }?.toDifficulty()
             val maxNumOfQuestions = navBackStackEntry.arguments?.getInt("numQuestions") ?: 0
             val viewModel = hiltViewModel<CreateQuizSecondScreenViewModel>()
+            val quizTemplateDialogViewModel = hiltViewModel<QuizTemplateDialogViewModel>()
             viewModel.initialize(categoryId, difficulty, maxNumOfQuestions)
             EnterFromRightAnimation {
                 CreateQuizSecondScreen(
                     viewModel = viewModel,
+                    quizTemplateDialogViewModel = quizTemplateDialogViewModel,
                     onNavigateToPlayQuiz = { timeLimit, categoryId, difficultyId, numOfQuestions ->
                         navController.navigate(
                             "${NavigationDestinations.PlayQuizScreen.name}/$timeLimit/true?categoryId=$categoryId&difficultyId=$difficultyId&numOfQuestions=$numOfQuestions"

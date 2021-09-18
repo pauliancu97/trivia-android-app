@@ -1,20 +1,14 @@
 package com.example.triviaapp.ui.screens.createquiz
 
-import android.content.Context
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import com.example.triviaapp.ui.models.Category
 import com.example.triviaapp.ui.models.Difficulty
-import com.example.triviaapp.ui.models.QuizTemplate
-import com.example.triviaapp.ui.models.toOption
 import com.example.triviaapp.ui.repositories.TriviaRepository
 import com.example.triviaapp.ui.utils.update
 import dagger.hilt.android.lifecycle.HiltViewModel
-import dagger.hilt.android.qualifiers.ApplicationContext
-import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.flow.*
 import kotlinx.coroutines.launch
-import kotlinx.coroutines.withContext
 import javax.inject.Inject
 
 enum class FieldErrorState {
@@ -22,19 +16,6 @@ enum class FieldErrorState {
     TooHigh,
     TooLow,
     Empty
-}
-
-enum class TemplateNameError {
-    Empty,
-    AlreadyExists
-}
-
-sealed class SaveQuizTemplateDialogState {
-    object Hidden : SaveQuizTemplateDialogState()
-    data class Shown(
-        val name: String? = null,
-        val error: TemplateNameError? = null
-    ) : SaveQuizTemplateDialogState()
 }
 
 data class CreateQuizSecondScreenState(
@@ -59,16 +40,6 @@ class CreateQuizSecondScreenViewModel @Inject constructor(
         MutableStateFlow(CreateQuizSecondScreenState())
 
     val stateFlow: Flow<CreateQuizSecondScreenState> = mutableStateFlow.asStateFlow()
-
-    private val mutableSaveTemplateDialogState: MutableStateFlow<SaveQuizTemplateDialogState> =
-        MutableStateFlow(SaveQuizTemplateDialogState.Hidden)
-
-    val saveTemplateDialogStateFlow: Flow<SaveQuizTemplateDialogState> = mutableSaveTemplateDialogState.asStateFlow()
-
-    private val mutableShowSavedTemplateEvent: MutableSharedFlow<String> =
-        MutableSharedFlow()
-
-    val showSavedTemplateEventFlow: Flow<String> = mutableShowSavedTemplateEvent.asSharedFlow()
 
     val isSaveAsTemplateEnabledFlow: Flow<Boolean> =
         stateFlow
@@ -141,54 +112,5 @@ class CreateQuizSecondScreenViewModel @Inject constructor(
         }
         return mutableStateFlow.value.numOfQuestionsErrorState == FieldErrorState.None &&
                 mutableStateFlow.value.timeLimitErrorState == FieldErrorState.None
-    }
-
-    fun showSaveTemplateDialog() {
-        mutableSaveTemplateDialogState.value = SaveQuizTemplateDialogState.Shown()
-    }
-
-    fun updateTemplateName(templateName: String) {
-        mutableSaveTemplateDialogState.update {
-            if (this is SaveQuizTemplateDialogState.Shown) {
-                copy(name = templateName, error = null)
-            } else {
-                this
-            }
-        }
-    }
-
-    suspend fun onSaveQuizTemplate(): String? {
-        val state = (mutableSaveTemplateDialogState.value as? SaveQuizTemplateDialogState.Shown) ?: return null
-        return if (state.name.isNullOrBlank()) {
-            mutableSaveTemplateDialogState.update {
-                state.copy(error = TemplateNameError.Empty)
-            }
-            null
-        } else if (withContext(Dispatchers.IO) { triviaRepository.isQuizTemplateWithName(state.name) }) {
-            mutableSaveTemplateDialogState.update {
-                state.copy(error = TemplateNameError.AlreadyExists)
-            }
-            null
-        } else {
-            withContext(Dispatchers.IO) {
-                triviaRepository.saveQuizTemplate(
-                    QuizTemplate(
-                        name = state.name,
-                        categoryName = mutableStateFlow.value.category?.name,
-                        categoryId = mutableStateFlow.value.category?.id,
-                        difficultyOption = mutableStateFlow.value.difficulty.toOption(),
-                        numOfQuestions = mutableStateFlow.value.numOfQuestions ?: 0,
-                        timeLimit = mutableStateFlow.value.timeLimit ?: 0
-                    )
-                )
-            }
-            mutableSaveTemplateDialogState.update { SaveQuizTemplateDialogState.Hidden }
-            mutableShowSavedTemplateEvent.emit(state.name)
-            state.name
-        }
-    }
-
-    fun hideSaveQuizAsTemplate() {
-        mutableSaveTemplateDialogState.update { SaveQuizTemplateDialogState.Hidden }
     }
 }
