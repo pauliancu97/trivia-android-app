@@ -25,7 +25,8 @@ import kotlinx.coroutines.launch
 @Composable
 fun StartScreen(
     viewModel: StartScreenViewModel,
-    navigateToCreateQuizFirstPage: () -> Unit
+    navigateToCreateQuizFirstPage: () -> Unit,
+    navigateToQuizTemplatesPage: () -> Unit
 ) {
     val coroutineScope = rememberCoroutineScope()
     val isFetching by viewModel.isFetchingLiveData().observeAsState(false)
@@ -36,6 +37,7 @@ fun StartScreen(
                 navigateToCreateQuizFirstPage()
             }
         },
+        onQuizTemplatesClick = { navigateToQuizTemplatesPage() },
         isFetching = isFetching
     )
 }
@@ -43,6 +45,7 @@ fun StartScreen(
 @Composable
 fun StartScreen(
     onPlayClick: () -> Unit,
+    onQuizTemplatesClick: () -> Unit,
     isFetching: Boolean = false
 ) {
     Column(
@@ -75,6 +78,13 @@ fun StartScreen(
                     .align(alignment = Alignment.CenterHorizontally)
             )
         }
+        Button(
+            onClick = onQuizTemplatesClick,
+            modifier = Modifier
+                .align(alignment = Alignment.CenterHorizontally)
+        ) {
+            Text(stringResource(R.string.quiz_templates))
+        }
     }
 }
 
@@ -82,6 +92,7 @@ fun StartScreen(
 @Preview
 fun PreviewStartScreen() {
     StartScreen(
-        onPlayClick = {}
+        onPlayClick = {},
+        onQuizTemplatesClick = {}
     )
 }

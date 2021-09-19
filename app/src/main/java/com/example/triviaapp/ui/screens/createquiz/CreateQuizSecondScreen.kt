@@ -15,8 +15,8 @@ import androidx.compose.ui.text.input.KeyboardType
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import com.example.triviaapp.R
-import com.example.triviaapp.ui.dialogs.QuizTemplateDialog
-import com.example.triviaapp.ui.dialogs.QuizTemplateDialogViewModel
+import com.example.triviaapp.ui.dialogs.savequiztemplate.QuizTemplateDialog
+import com.example.triviaapp.ui.dialogs.savequiztemplate.QuizTemplateDialogViewModel
 import com.example.triviaapp.ui.models.toOption
 import kotlinx.coroutines.launch
 

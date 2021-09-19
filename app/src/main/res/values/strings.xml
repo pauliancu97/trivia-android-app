@@ -43,4 +43,11 @@
     <string name="rename_quiz_template_message">Please enter a new name for this quiz template</string>
     <string name="quiz_template_not_renamed">Entered name is not different from the current name</string>\
     <string name="renamed_quiz_template">Renamed quiz template to \"%1$d\"</string>
+    <string name="category_with_arg">Category: %1$s</string>
+    <string name="difficulty_with_arg">Difficulty: %1$s</string>
+    <string name="num_questions_with_arg">Number of questions: %1$d</string>
+    <string name="time_limit_with_arg">Time limit: %1$d (seconds)</string>
+    <string name="quiz_templates">Quiz Templates</string>
+    <string name="play_quiz_title">Play Quiz</string>
+    <string name="play_quiz_message">Are you sure you want to play \"%1$s\ quiz template?"</string>
 </resources>

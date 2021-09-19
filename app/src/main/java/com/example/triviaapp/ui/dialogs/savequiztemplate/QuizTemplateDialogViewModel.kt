@@ -1,4 +1,4 @@
-package com.example.triviaapp.ui.dialogs
+package com.example.triviaapp.ui.dialogs.savequiztemplate
 
 import androidx.lifecycle.ViewModel
 import com.example.triviaapp.ui.models.DifficultyOption

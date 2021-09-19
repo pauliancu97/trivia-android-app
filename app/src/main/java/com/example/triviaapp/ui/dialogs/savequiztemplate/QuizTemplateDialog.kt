@@ -1,4 +1,4 @@
-package com.example.triviaapp.ui.dialogs
+package com.example.triviaapp.ui.dialogs.savequiztemplate
 
 import androidx.compose.foundation.layout.Column
 import androidx.compose.material.*

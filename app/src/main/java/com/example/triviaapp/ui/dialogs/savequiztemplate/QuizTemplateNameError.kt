@@ -1,4 +1,4 @@
-package com.example.triviaapp.ui.dialogs
+package com.example.triviaapp.ui.dialogs.savequiztemplate
 
 enum class QuizTemplateNameError {
     Empty,

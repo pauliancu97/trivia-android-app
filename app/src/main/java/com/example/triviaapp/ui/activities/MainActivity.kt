@@ -13,7 +13,8 @@ import androidx.navigation.compose.composable
 import androidx.navigation.compose.navArgument
 import androidx.navigation.compose.rememberNavController
 import com.example.triviaapp.ui.animations.EnterFromRightAnimation
-import com.example.triviaapp.ui.dialogs.QuizTemplateDialogViewModel
+import com.example.triviaapp.ui.dialogs.playquiztemplate.PlayQuizTemplateDialogViewModel
+import com.example.triviaapp.ui.dialogs.savequiztemplate.QuizTemplateDialogViewModel
 import com.example.triviaapp.ui.models.DifficultyOption
 import com.example.triviaapp.ui.navigation.NavigationDestinations
 import com.example.triviaapp.ui.screens.createquiz.CreateQuizFirstScreen
@@ -23,6 +24,8 @@ import com.example.triviaapp.ui.screens.createquiz.CreateQuizSecondScreenViewMod
 import com.example.triviaapp.ui.screens.finishquiz.FinishQuizScreen
 import com.example.triviaapp.ui.screens.playquiz.PlayQuizScreen
 import com.example.triviaapp.ui.screens.playquiz.PlayQuizViewModel
+import com.example.triviaapp.ui.screens.quiztemplates.QuizTemplatesScreen
+import com.example.triviaapp.ui.screens.quiztemplates.QuizTemplatesViewModel
 import com.example.triviaapp.ui.screens.start.StartScreen
 import com.example.triviaapp.ui.screens.start.StartScreenViewModel
 import com.example.triviaapp.ui.theme.TriviaAppTheme
@@ -62,6 +65,9 @@ fun TriviaAppNavHost() {
                 viewModel = viewModel,
                 navigateToCreateQuizFirstPage = {
                     navController.navigate(NavigationDestinations.CreateQuizFirstScreen.name)
+                },
+                navigateToQuizTemplatesPage = {
+                    navController.navigate(NavigationDestinations.QuizTemplates.name)
                 }
             )
         }
@@ -241,6 +247,19 @@ fun TriviaAppNavHost() {
                     }
                 )
             }
+        }
+        composable(NavigationDestinations.QuizTemplates.name) {
+            val quizTemplatesViewModel = hiltViewModel<QuizTemplatesViewModel>()
+            val playQuizTemplateDialogViewModel = hiltViewModel<PlayQuizTemplateDialogViewModel>()
+            QuizTemplatesScreen(
+                quizTemplatesViewModel = quizTemplatesViewModel,
+                playQuizTemplateDialogViewModel = playQuizTemplateDialogViewModel,
+                onNavigateToPlayQuiz = { timeLimit, categoryId, difficultyId, numOfQuestions ->
+                    navController.navigate(
+                        "${NavigationDestinations.PlayQuizScreen.name}/$timeLimit/true?categoryId=$categoryId&difficultyId=$difficultyId&numOfQuestions=$numOfQuestions"
+                    )
+                }
+            )
         }
     }
 }

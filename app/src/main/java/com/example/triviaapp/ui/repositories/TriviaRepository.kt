@@ -197,6 +197,15 @@ class TriviaRepository @Inject constructor(
     suspend fun getQuizTemplatesIdsWithName(name: String) =
         quizTemplateDao.getQuizTemplatesIdsWithName(name)
 
+    fun getQuizTemplatesFlow() =
+        quizTemplateDao.getQuizTemplatesFlow()
+            .map { quizTemplatesResults ->
+                quizTemplatesResults.map { it.toModel() }
+            }
+
+    suspend fun getQuizTemplateWithName(name: String) =
+        quizTemplateDao.getQuizTemplateWithName(name)?.toModel()
+
     private suspend fun QuestionBooleanEntity.toModel() =
         Question.QuestionBoolean(
             text = this.text,
