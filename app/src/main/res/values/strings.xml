@@ -50,4 +50,7 @@
     <string name="quiz_templates">Quiz Templates</string>
     <string name="play_quiz_title">Play Quiz</string>
     <string name="play_quiz_message">Are you sure you want to play \"%1$s\ quiz template?"</string>
+    <string name="delete_quiz_template_title">Delete quiz template</string>
+    <string name="delete_quiz_template_message">Are you sure you want to delete \"%1$s\"?</string>
+    <string name="deleted_quiz_template">Deleted quiz template \"%1$s\"</string>
 </resources>

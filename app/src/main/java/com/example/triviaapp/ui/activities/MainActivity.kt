@@ -13,6 +13,7 @@ import androidx.navigation.compose.composable
 import androidx.navigation.compose.navArgument
 import androidx.navigation.compose.rememberNavController
 import com.example.triviaapp.ui.animations.EnterFromRightAnimation
+import com.example.triviaapp.ui.dialogs.deletequiztemplate.DeleteQuizTemplateViewModel
 import com.example.triviaapp.ui.dialogs.playquiztemplate.PlayQuizTemplateDialogViewModel
 import com.example.triviaapp.ui.dialogs.savequiztemplate.QuizTemplateDialogViewModel
 import com.example.triviaapp.ui.models.DifficultyOption
@@ -252,10 +253,12 @@ fun TriviaAppNavHost() {
             val quizTemplatesViewModel = hiltViewModel<QuizTemplatesViewModel>()
             val playQuizTemplateDialogViewModel = hiltViewModel<PlayQuizTemplateDialogViewModel>()
             val quizTemplateDialogViewModel = hiltViewModel<QuizTemplateDialogViewModel>()
+            val deleteQuizTemplateViewModel = hiltViewModel<DeleteQuizTemplateViewModel>()
             QuizTemplatesScreen(
                 quizTemplatesViewModel = quizTemplatesViewModel,
                 playQuizTemplateDialogViewModel = playQuizTemplateDialogViewModel,
                 quizTemplateDialogViewModel = quizTemplateDialogViewModel,
+                deleteQuizTemplateViewModel = deleteQuizTemplateViewModel,
                 onNavigateToPlayQuiz = { timeLimit, categoryId, difficultyId, numOfQuestions ->
                     navController.navigate(
                         "${NavigationDestinations.PlayQuizScreen.name}/$timeLimit/true?categoryId=$categoryId&difficultyId=$difficultyId&numOfQuestions=$numOfQuestions"

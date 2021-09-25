@@ -21,6 +21,8 @@ import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import com.example.triviaapp.R
+import com.example.triviaapp.ui.dialogs.deletequiztemplate.DeleteQuizTemplateDialog
+import com.example.triviaapp.ui.dialogs.deletequiztemplate.DeleteQuizTemplateViewModel
 import com.example.triviaapp.ui.dialogs.playquiztemplate.PlayQuizTemplateDialog
 import com.example.triviaapp.ui.dialogs.playquiztemplate.PlayQuizTemplateDialogViewModel
 import com.example.triviaapp.ui.dialogs.savequiztemplate.QuizTemplateDialog
@@ -35,12 +37,12 @@ fun QuizTemplatesScreen(
     quizTemplatesViewModel: QuizTemplatesViewModel,
     playQuizTemplateDialogViewModel: PlayQuizTemplateDialogViewModel,
     quizTemplateDialogViewModel: QuizTemplateDialogViewModel,
+    deleteQuizTemplateViewModel: DeleteQuizTemplateViewModel,
     onNavigateToPlayQuiz: (Int, Int, Int, Int) -> Unit
 ) {
     val quizTemplates by quizTemplatesViewModel.getQuizTemplatesFlow().collectAsState(emptyList())
     val scaffoldState = rememberScaffoldState()
     val scope = rememberCoroutineScope()
-    val context = LocalContext.current
     Scaffold(
         scaffoldState = scaffoldState
     ) {
@@ -52,7 +54,9 @@ fun QuizTemplatesScreen(
             onRenameClick = {
                 quizTemplateDialogViewModel.showForEditing(it)
             },
-            onDeleteClick = {}
+            onDeleteClick = {
+                deleteQuizTemplateViewModel.show(it)
+            }
         )
         PlayQuizTemplateDialog(
             playQuizTemplateDialogViewModel,
@@ -61,6 +65,14 @@ fun QuizTemplatesScreen(
         QuizTemplateDialog(
             viewModel = quizTemplateDialogViewModel,
             onQuizTemplateSaved = {
+                scope.launch {
+                    scaffoldState.snackbarHostState.showSnackbar(it)
+                }
+            }
+        )
+        DeleteQuizTemplateDialog(
+            viewModel = deleteQuizTemplateViewModel,
+            onDeleteQuizTemplate = {
                 scope.launch {
                     scaffoldState.snackbarHostState.showSnackbar(it)
                 }

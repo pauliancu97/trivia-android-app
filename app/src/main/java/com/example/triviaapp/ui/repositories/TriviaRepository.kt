@@ -190,7 +190,14 @@ class TriviaRepository @Inject constructor(
         quizTemplateDao.insert(quizTemplate.toEntity())
     }
 
-    suspend fun updateQuizTemplateName(id: Long, name: String) {
+    suspend fun deleteQuizTemplateWithName(quizTemplateName: String) {
+        val quizTemplateId = quizTemplateDao.getQuizTemplateIdWithName(quizTemplateName)
+        if (quizTemplateId != null) {
+            quizTemplateDao.deleteQuizTemplate(quizTemplateId)
+        }
+    }
+
+    suspend fun updateQuizTemplateName(id: Int, name: String) {
         quizTemplateDao.updateQuizTemplateName(id, name)
     }
 

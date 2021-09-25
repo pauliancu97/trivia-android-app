@@ -21,7 +21,7 @@ sealed class QuizTemplateDialogState {
         ) : Shown()
 
         data class Edit(
-            val quizTemplateId: Long,
+            val quizTemplateId: Int,
             override val name: String? = null,
             override val error: QuizTemplateNameError? = null
         ) : Shown()
