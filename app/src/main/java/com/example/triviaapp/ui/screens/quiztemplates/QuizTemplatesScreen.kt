@@ -14,35 +14,59 @@ import androidx.compose.material.icons.filled.PlayArrow
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.collectAsState
 import androidx.compose.runtime.getValue
+import androidx.compose.runtime.rememberCoroutineScope
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import com.example.triviaapp.R
 import com.example.triviaapp.ui.dialogs.playquiztemplate.PlayQuizTemplateDialog
 import com.example.triviaapp.ui.dialogs.playquiztemplate.PlayQuizTemplateDialogViewModel
+import com.example.triviaapp.ui.dialogs.savequiztemplate.QuizTemplateDialog
+import com.example.triviaapp.ui.dialogs.savequiztemplate.QuizTemplateDialogState
+import com.example.triviaapp.ui.dialogs.savequiztemplate.QuizTemplateDialogViewModel
 import com.example.triviaapp.ui.models.DifficultyOption
 import com.example.triviaapp.ui.models.QuizTemplate
+import kotlinx.coroutines.launch
 
 @Composable
 fun QuizTemplatesScreen(
     quizTemplatesViewModel: QuizTemplatesViewModel,
     playQuizTemplateDialogViewModel: PlayQuizTemplateDialogViewModel,
+    quizTemplateDialogViewModel: QuizTemplateDialogViewModel,
     onNavigateToPlayQuiz: (Int, Int, Int, Int) -> Unit
 ) {
     val quizTemplates by quizTemplatesViewModel.getQuizTemplatesFlow().collectAsState(emptyList())
-    QuizTemplatesScreen(
-        quizTemplates = quizTemplates,
-        onPlayClick = { quizTemplateName ->
-            playQuizTemplateDialogViewModel.show(quizTemplateName)
-        },
-        onRenameClick = {},
-        onDeleteClick = {}
-    )
-    PlayQuizTemplateDialog(
-        playQuizTemplateDialogViewModel,
-        onNavigateToPlayQuiz
-    )
+    val scaffoldState = rememberScaffoldState()
+    val scope = rememberCoroutineScope()
+    val context = LocalContext.current
+    Scaffold(
+        scaffoldState = scaffoldState
+    ) {
+        QuizTemplatesScreen(
+            quizTemplates = quizTemplates,
+            onPlayClick = { quizTemplateName ->
+                playQuizTemplateDialogViewModel.show(quizTemplateName)
+            },
+            onRenameClick = {
+                quizTemplateDialogViewModel.showForEditing(it)
+            },
+            onDeleteClick = {}
+        )
+        PlayQuizTemplateDialog(
+            playQuizTemplateDialogViewModel,
+            onNavigateToPlayQuiz
+        )
+        QuizTemplateDialog(
+            viewModel = quizTemplateDialogViewModel,
+            onQuizTemplateSaved = {
+                scope.launch {
+                    scaffoldState.snackbarHostState.showSnackbar(it)
+                }
+            }
+        )
+    }
 }
 
 @Composable

@@ -11,8 +11,7 @@ import kotlinx.coroutines.flow.Flow
 
 @Dao
 interface QuizTemplateDao {
-
-    @Insert(onConflict = OnConflictStrategy.REPLACE)
+    @Insert
     suspend fun insert(quizTemplateEntity: QuizTemplateEntity)
 
     @Query("SELECT template.name AS name, category.name AS category_name, template.category_id AS category_id, template.difficulty_option AS difficulty, template.num_of_questions AS num_questions, template.time_limit AS time_limit  FROM ${QuizTemplateEntity.TABLE_NAME} template LEFT JOIN ${CategoryEntity.TABLE_NAME} category ON template.category_id = category.id")
@@ -24,6 +23,9 @@ interface QuizTemplateDao {
     @Query("SELECT COUNT(*) FROM ${QuizTemplateEntity.TABLE_NAME} WHERE name = :name")
     suspend fun getNumOfQuizTemplatesWithName(name: String): Int
 
+    @Query("SELECT COUNT(*) FROM ${QuizTemplateEntity.TABLE_NAME}")
+    suspend fun getNumOfQuizTemplates(): Int
+
     @Query("UPDATE ${QuizTemplateEntity.TABLE_NAME} SET ${QuizTemplateEntity.NAME} = :name WHERE ${QuizTemplateEntity.ID} = :id")
     suspend fun updateQuizTemplateName(id: Long, name: String)
 
@@ -32,4 +34,7 @@ interface QuizTemplateDao {
 
     @Query("SELECT template.name AS name, category.name AS category_name, template.category_id AS category_id, template.difficulty_option AS difficulty, template.num_of_questions AS num_questions, template.time_limit AS time_limit  FROM ${QuizTemplateEntity.TABLE_NAME} template LEFT JOIN ${CategoryEntity.TABLE_NAME} category ON template.category_id = category.id WHERE template.name = :name LIMIT 1")
     suspend fun getQuizTemplateWithName(name: String): QuizTemplateResult?
+
+    @Query("SELECT ${QuizTemplateEntity.ID} FROM ${QuizTemplateEntity.TABLE_NAME} WHERE ${QuizTemplateEntity.NAME} = :name LIMIT 1")
+    suspend fun getQuizTemplateIdWithName(name: String): Long?
 }

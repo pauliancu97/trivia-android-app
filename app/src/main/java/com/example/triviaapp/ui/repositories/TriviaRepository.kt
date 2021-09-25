@@ -206,6 +206,9 @@ class TriviaRepository @Inject constructor(
     suspend fun getQuizTemplateWithName(name: String) =
         quizTemplateDao.getQuizTemplateWithName(name)?.toModel()
 
+    suspend fun getQuizTemplateIdWithName(name: String) =
+        quizTemplateDao.getQuizTemplateIdWithName(name)
+
     private suspend fun QuestionBooleanEntity.toModel() =
         Question.QuestionBoolean(
             text = this.text,

@@ -1,6 +1,7 @@
 package com.example.triviaapp.ui.dialogs.savequiztemplate
 
 import androidx.lifecycle.ViewModel
+import androidx.lifecycle.viewModelScope
 import com.example.triviaapp.ui.models.DifficultyOption
 import com.example.triviaapp.ui.models.QuizTemplate
 import com.example.triviaapp.ui.repositories.TriviaRepository
@@ -10,6 +11,7 @@ import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.asStateFlow
+import kotlinx.coroutines.launch
 import kotlinx.coroutines.withContext
 import javax.inject.Inject
 
@@ -36,8 +38,18 @@ class QuizTemplateDialogViewModel @Inject constructor(
         }
     }
 
-    fun showForEditing(quizTemplateId: Long) {
-        mutableStateFlow.update { QuizTemplateDialogState.Shown.Edit(quizTemplateId) }
+    fun showForEditing(quizTemplateName: String) {
+        viewModelScope.launch {
+            val quizTemplateId = triviaRepository.getQuizTemplateIdWithName(quizTemplateName)
+            if (quizTemplateId != null) {
+                mutableStateFlow.update {
+                    QuizTemplateDialogState.Shown.Edit(
+                        quizTemplateId = quizTemplateId,
+                        name = quizTemplateName
+                    )
+                }
+            }
+        }
     }
 
     fun hide() {

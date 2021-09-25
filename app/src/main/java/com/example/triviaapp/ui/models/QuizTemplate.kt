@@ -12,7 +12,7 @@ data class QuizTemplate(
     val timeLimit: Int
 ) {
     fun toEntity() = QuizTemplateEntity(
-        id = null,
+        id = 0,
         name = name,
         categoryId = categoryId,
         difficultyOption = when(difficultyOption) {

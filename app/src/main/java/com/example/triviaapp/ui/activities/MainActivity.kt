@@ -251,9 +251,11 @@ fun TriviaAppNavHost() {
         composable(NavigationDestinations.QuizTemplates.name) {
             val quizTemplatesViewModel = hiltViewModel<QuizTemplatesViewModel>()
             val playQuizTemplateDialogViewModel = hiltViewModel<PlayQuizTemplateDialogViewModel>()
+            val quizTemplateDialogViewModel = hiltViewModel<QuizTemplateDialogViewModel>()
             QuizTemplatesScreen(
                 quizTemplatesViewModel = quizTemplatesViewModel,
                 playQuizTemplateDialogViewModel = playQuizTemplateDialogViewModel,
+                quizTemplateDialogViewModel = quizTemplateDialogViewModel,
                 onNavigateToPlayQuiz = { timeLimit, categoryId, difficultyId, numOfQuestions ->
                     navController.navigate(
                         "${NavigationDestinations.PlayQuizScreen.name}/$timeLimit/true?categoryId=$categoryId&difficultyId=$difficultyId&numOfQuestions=$numOfQuestions"

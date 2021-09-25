@@ -6,16 +6,10 @@ import androidx.room.ForeignKey
 import androidx.room.PrimaryKey
 
 @Entity(
-    tableName = QuizTemplateEntity.TABLE_NAME,
-    foreignKeys = [ForeignKey(
-        entity = CategoryEntity::class,
-        parentColumns = arrayOf(CategoryEntity.ID_COLUMN),
-        childColumns = arrayOf(QuizTemplateEntity.CATEGORY_ID),
-        onDelete = ForeignKey.CASCADE
-    )]
+    tableName = QuizTemplateEntity.TABLE_NAME
 )
 data class QuizTemplateEntity(
-    @PrimaryKey(autoGenerate = true) @ColumnInfo(name = ID) val id: Long?,
+    @PrimaryKey(autoGenerate = true) val id: Int = 0,
     @ColumnInfo(name = CATEGORY_ID) val categoryId: Int?,
     @ColumnInfo(name = DIFFICULTY_OPTION) val difficultyOption: DifficultyOptionEntity,
     @ColumnInfo(name = NUM_OF_QUESTIONS) val numOfQuestions: Int,

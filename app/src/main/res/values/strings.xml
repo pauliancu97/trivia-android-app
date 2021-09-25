@@ -42,7 +42,7 @@
     <string name="rename_quiz_template">Rename quiz template</string>
     <string name="rename_quiz_template_message">Please enter a new name for this quiz template</string>
     <string name="quiz_template_not_renamed">Entered name is not different from the current name</string>\
-    <string name="renamed_quiz_template">Renamed quiz template to \"%1$d\"</string>
+    <string name="renamed_quiz_template">Renamed quiz template to \"%1$s\"</string>
     <string name="category_with_arg">Category: %1$s</string>
     <string name="difficulty_with_arg">Difficulty: %1$s</string>
     <string name="num_questions_with_arg">Number of questions: %1$d</string>
