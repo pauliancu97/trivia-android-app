@@ -6,5 +6,6 @@ enum class NavigationDestinations {
     CreateQuizSecondScreen,
     PlayQuizScreen,
     FinishedQuizScreen,
-    QuizTemplates
+    QuizTemplates,
+    Settings
 }

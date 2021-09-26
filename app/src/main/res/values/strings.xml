@@ -53,4 +53,6 @@
     <string name="delete_quiz_template_title">Delete quiz template</string>
     <string name="delete_quiz_template_message">Are you sure you want to delete \"%1$s\"?</string>
     <string name="deleted_quiz_template">Deleted quiz template \"%1$s\"</string>
+    <string name="home">Home</string>
+    <string name="Settings">Settings</string>
 </resources>
