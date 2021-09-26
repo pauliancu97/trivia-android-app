@@ -13,11 +13,10 @@ import androidx.compose.runtime.*
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.res.stringResource
 import androidx.hilt.navigation.compose.hiltViewModel
+import androidx.navigation.NavController
+import androidx.navigation.NavHostController
 import androidx.navigation.NavType
-import androidx.navigation.compose.NavHost
-import androidx.navigation.compose.composable
-import androidx.navigation.compose.navArgument
-import androidx.navigation.compose.rememberNavController
+import androidx.navigation.compose.*
 import com.example.triviaapp.R
 import com.example.triviaapp.ui.animations.EnterFromRightAnimation
 import com.example.triviaapp.ui.dialogs.deletequiztemplate.DeleteQuizTemplateViewModel
@@ -57,10 +56,15 @@ class MainActivity : ComponentActivity() {
 @Composable
 fun TriviaApp() {
     TriviaAppTheme {
-        var selectedDrawerDestination: MutableState<DrawerDestination?> =
-            remember { mutableStateOf(DrawerDestination.Home) }
         val scope = rememberCoroutineScope()
         val drawerState = rememberDrawerState(initialValue = DrawerValue.Closed)
+        val navController = rememberNavController()
+        val navState = navController.currentBackStackEntryAsState()
+        val selectedDrawerDestination = when (navState.value?.destination?.route) {
+            NavigationDestinations.StartScreen.name -> DrawerDestination.Home
+            NavigationDestinations.Settings.name -> DrawerDestination.Settings
+            else -> null
+        }
         val openDrawer = {
             scope.launch { drawerState.open() }
             Unit
@@ -70,13 +74,11 @@ fun TriviaApp() {
             Unit
         }
         TriviaAppNavHost(
-            selectedDrawerDestination = selectedDrawerDestination.value,
-            onDrawerDestinationSelected = {
-                selectedDrawerDestination.value = it
-            },
+            selectedDrawerDestination = selectedDrawerDestination,
             drawerState = drawerState,
             openDrawer = openDrawer,
-            closeDrawer = closeDrawer
+            closeDrawer = closeDrawer,
+            navController = navController
         )
     }
 }
@@ -84,19 +86,17 @@ fun TriviaApp() {
 @Composable
 fun TriviaAppNavHost(
     selectedDrawerDestination: DrawerDestination? = null,
-    onDrawerDestinationSelected: (DrawerDestination) -> Unit,
     drawerState: DrawerState,
     openDrawer: () -> Unit,
-    closeDrawer: () -> Unit
+    closeDrawer: () -> Unit,
+    navController: NavHostController
 ) {
-    val navController = rememberNavController()
     Surface(color = MaterialTheme.colors.background) {
         ModalDrawer(
             drawerContent = {
                 Drawer(
                     selectedDrawerDestination = selectedDrawerDestination,
                     onDrawerItemClicked = {
-                        onDrawerDestinationSelected(it)
                         navController.navigate(it.navigationDestination.name) {
                             popUpTo(navController.graph.startDestinationId)
                             launchSingleTop = true
