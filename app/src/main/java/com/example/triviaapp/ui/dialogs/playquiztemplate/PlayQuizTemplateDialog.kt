@@ -22,6 +22,7 @@ fun PlayQuizTemplateDialog(
     PlayQuizTemplateDialog(
         playQuizTemplateDialogState = state,
         onPlayClick = { quizTemplate ->
+            playQuizTemplateDialogViewModel.hide()
             onNavigateToPlayQuiz(
                 quizTemplate.timeLimit,
                 quizTemplate.categoryId ?: 0,

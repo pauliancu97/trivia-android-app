@@ -160,6 +160,8 @@ fun TriviaAppNavHost() {
                 }
             )
         ) {
+            val isFromQuizTemplatesScreen = navController.previousBackStackEntry
+                ?.destination?.route == NavigationDestinations.QuizTemplates.name
             val timeLimit = it.arguments?.getInt("timeLimit") ?: 0
             val categoryId = it.arguments?.getInt("categoryId")
             val difficulty = it.arguments?.getInt("difficultyId")?.let { id -> DifficultyOption.values().getOrNull(id) }
@@ -175,10 +177,16 @@ fun TriviaAppNavHost() {
                     onNavigateToFinishedQuiz = { score, totalScore, numOfCorrectAnswers, numOfQuestions ->
                         val url = "${NavigationDestinations.FinishedQuizScreen.name}/$score/$totalScore/$numOfCorrectAnswers/$numOfQuestions/$timeLimit"
                         navController.navigate(url) {
-                            popUpTo(
-                                route = NavigationDestinations.CreateQuizFirstScreen.name
-                            ) {
-                                inclusive = true
+                            if (isFromQuizTemplatesScreen) {
+                                popUpTo(
+                                    route = NavigationDestinations.QuizTemplates.name
+                                )
+                            } else {
+                                popUpTo(
+                                    route = NavigationDestinations.CreateQuizFirstScreen.name
+                                ) {
+                                    inclusive = true
+                                }
                             }
                         }
                     },
