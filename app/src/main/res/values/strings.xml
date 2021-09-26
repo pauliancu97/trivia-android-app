@@ -55,4 +55,8 @@
     <string name="deleted_quiz_template">Deleted quiz template \"%1$s\"</string>
     <string name="home">Home</string>
     <string name="Settings">Settings</string>
+    <string name="system_default">System Default</string>
+    <string name="light">Light</string>
+    <string name="dark">Dark</string>
+    <string name="selected_theme">Select theme</string>
 </resources>

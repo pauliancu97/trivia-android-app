@@ -13,6 +13,7 @@ import androidx.compose.runtime.*
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.res.stringResource
 import androidx.hilt.navigation.compose.hiltViewModel
+import androidx.lifecycle.viewmodel.compose.viewModel
 import androidx.navigation.NavController
 import androidx.navigation.NavHostController
 import androidx.navigation.NavType
@@ -26,6 +27,7 @@ import com.example.triviaapp.ui.drawer.Drawer
 import com.example.triviaapp.ui.drawer.DrawerDestination
 import com.example.triviaapp.ui.drawer.TopMenuAppBar
 import com.example.triviaapp.ui.models.DifficultyOption
+import com.example.triviaapp.ui.models.ThemeSetting
 import com.example.triviaapp.ui.navigation.NavigationDestinations
 import com.example.triviaapp.ui.screens.createquiz.CreateQuizFirstScreen
 import com.example.triviaapp.ui.screens.createquiz.CreateQuizFirstScreenViewModel
@@ -36,11 +38,14 @@ import com.example.triviaapp.ui.screens.playquiz.PlayQuizScreen
 import com.example.triviaapp.ui.screens.playquiz.PlayQuizViewModel
 import com.example.triviaapp.ui.screens.quiztemplates.QuizTemplatesScreen
 import com.example.triviaapp.ui.screens.quiztemplates.QuizTemplatesViewModel
+import com.example.triviaapp.ui.screens.settings.SettingsScreen
+import com.example.triviaapp.ui.screens.settings.SettingsScreenViewModel
 import com.example.triviaapp.ui.screens.start.StartScreen
 import com.example.triviaapp.ui.screens.start.StartScreenViewModel
 import com.example.triviaapp.ui.theme.TriviaAppTheme
 import dagger.hilt.android.AndroidEntryPoint
 import kotlinx.coroutines.launch
+import javax.inject.Inject
 
 @AndroidEntryPoint
 class MainActivity : ComponentActivity() {
@@ -48,14 +53,18 @@ class MainActivity : ComponentActivity() {
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         setContent {
-            TriviaApp()
+            val mainViewModel = viewModel<MainViewModel>()
+            val themeSetting by mainViewModel.themeSettingFlow().collectAsState(ThemeSetting.SystemDefault)
+            TriviaApp(themeSetting)
         }
     }
 }
 
 @Composable
-fun TriviaApp() {
-    TriviaAppTheme {
+fun TriviaApp(
+    themeSetting: ThemeSetting
+) {
+    TriviaAppTheme(themeSetting) {
         val scope = rememberCoroutineScope()
         val drawerState = rememberDrawerState(initialValue = DrawerValue.Closed)
         val navController = rememberNavController()
@@ -332,7 +341,8 @@ fun TriviaAppNavHost(
                 composable(NavigationDestinations.Settings.name) {
                     Column {
                         TopMenuAppBar(openDrawer)
-                        Text(text = stringResource(R.string.Settings))
+                        val viewModel = hiltViewModel<SettingsScreenViewModel>()
+                        SettingsScreen(viewModel = viewModel)
                     }
                 }
             }
