@@ -12,4 +12,5 @@ class MainViewModel @Inject constructor(
 
     fun themeSettingFlow() = settingsRepository.themeSettingFlow()
 
+    fun getThemeSetting() = settingsRepository.themeSetting
 }

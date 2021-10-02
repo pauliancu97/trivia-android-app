@@ -53,8 +53,8 @@ class MainActivity : ComponentActivity() {
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         setContent {
-            val mainViewModel = viewModel<MainViewModel>()
-            val themeSetting by mainViewModel.themeSettingFlow().collectAsState(ThemeSetting.SystemDefault)
+            val mainViewModel = hiltViewModel<MainViewModel>()
+            val themeSetting by mainViewModel.themeSettingFlow().collectAsState(mainViewModel.getThemeSetting())
             TriviaApp(themeSetting)
         }
     }
