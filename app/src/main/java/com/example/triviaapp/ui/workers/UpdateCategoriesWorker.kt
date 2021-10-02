@@ -33,7 +33,7 @@ class UpdateCategoriesWorkerRequester @Inject constructor(
     @ApplicationContext private val context: Context
 ) {
     companion object {
-        private const val PERIOD_VALUE = 1L
+        private const val PERIOD_VALUE = 30L
         private val PERIOD_UM = TimeUnit.MINUTES
         private const val WORK_NAME = "update_categories_work"
     }
