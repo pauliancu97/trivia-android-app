@@ -18,6 +18,7 @@ import androidx.compose.ui.res.dimensionResource
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.tooling.preview.Preview
+import androidx.compose.ui.unit.dp
 import com.example.triviaapp.R
 import kotlinx.coroutines.launch
 
@@ -69,21 +70,23 @@ fun StartScreen(
                 onClick = onPlayClick,
                 modifier = Modifier
                     .align(alignment = Alignment.CenterHorizontally)
+                    .padding(5.dp)
             ) {
                 Text(text = stringResource(R.string.play))
+            }
+            Button(
+                onClick = onQuizTemplatesClick,
+                modifier = Modifier
+                    .align(alignment = Alignment.CenterHorizontally)
+                    .padding(5.dp)
+            ) {
+                Text(stringResource(R.string.quiz_templates))
             }
         } else {
             CircularProgressIndicator(
                 modifier = Modifier
                     .align(alignment = Alignment.CenterHorizontally)
             )
-        }
-        Button(
-            onClick = onQuizTemplatesClick,
-            modifier = Modifier
-                .align(alignment = Alignment.CenterHorizontally)
-        ) {
-            Text(stringResource(R.string.quiz_templates))
         }
     }
 }
