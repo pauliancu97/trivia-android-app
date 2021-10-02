@@ -17,7 +17,6 @@ import com.example.triviaapp.ui.utils.toModel
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.flow.map
 import kotlinx.coroutines.withContext
-import timber.log.Timber
 import java.net.URLDecoder
 import javax.inject.Inject
 
@@ -60,6 +59,54 @@ class TriviaRepository @Inject constructor(
                 )
             }
         categoryDao.insertAll(categoriesEntities)
+    }
+
+    suspend fun updateCategories() = withContext(Dispatchers.IO) {
+        val fetchedCategoriesSummaries = triviaService.getCategoriesLookupResponse()
+        val fetchedCategoriesQuestionsCount = fetchedCategoriesSummaries.categories
+            .map { category ->
+                triviaService.getCategoryQuestionCountResponse(category.id)
+            }
+        val fetchedCategoriesIds = fetchedCategoriesSummaries.categories.map { it.id }.toSet()
+        val fetchedCategoriesNamesById = fetchedCategoriesSummaries.categories
+            .associateBy { it.id }
+            .mapValues { (_, category) -> category.name }
+        val fetchedCategoriesQuestionsCountById = fetchedCategoriesQuestionsCount
+            .associateBy { it.categoryId }
+        val databaseCategoriesIds = categoryDao.getCategoriesIds().toSet()
+        val addedCategoriesIds = fetchedCategoriesIds - databaseCategoriesIds
+        val deletedCategoriesIds = databaseCategoriesIds - fetchedCategoriesIds
+        val updatedCategoriesIds = databaseCategoriesIds intersect fetchedCategoriesIds
+        val addedCategoriesEntities = addedCategoriesIds
+            .mapNotNull { id ->
+                val categoryName = fetchedCategoriesNamesById[id] ?: return@mapNotNull null
+                val categoryQuestionCount = fetchedCategoriesQuestionsCountById[id]?.questionsCount
+                    ?: return@mapNotNull null
+                CategoryEntity(
+                    id = id,
+                    name = categoryName,
+                    numOfQuestions = categoryQuestionCount.numOfQuestions,
+                    numOfEasyQuestions = categoryQuestionCount.numOfEasyQuestions,
+                    numOfMediumQuestions = categoryQuestionCount.numOfNormalQuestions,
+                    numOfHardQuestions = categoryQuestionCount.numOfHardQuestions
+                )
+            }
+        triviaDatabase.withTransaction {
+            categoryDao.insertAll(addedCategoriesEntities)
+            categoryDao.deleteCategories(deletedCategoriesIds)
+            for (id in updatedCategoriesIds) {
+                val questionCount = fetchedCategoriesQuestionsCountById[id]?.questionsCount
+                if (questionCount != null) {
+                    categoryDao.updateCategory(
+                        id,
+                        questionCount.numOfQuestions,
+                        questionCount.numOfEasyQuestions,
+                        questionCount.numOfNormalQuestions,
+                        questionCount.numOfHardQuestions
+                    )
+                }
+            }
+        }
     }
 
     suspend fun hasSavedCategories(): Boolean = withContext(Dispatchers.IO) {

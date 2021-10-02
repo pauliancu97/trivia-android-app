@@ -54,6 +54,7 @@ class MainActivity : ComponentActivity() {
         super.onCreate(savedInstanceState)
         setContent {
             val mainViewModel = hiltViewModel<MainViewModel>()
+            mainViewModel.enqueueUpdateCategoriesWorker()
             val themeSetting by mainViewModel.themeSettingFlow().collectAsState(mainViewModel.getThemeSetting())
             TriviaApp(themeSetting)
         }

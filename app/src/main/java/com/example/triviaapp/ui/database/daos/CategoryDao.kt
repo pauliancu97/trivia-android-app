@@ -19,6 +19,9 @@ interface CategoryDao {
     @Query("SELECT * FROM ${CategoryEntity.TABLE_NAME}")
     suspend fun getCategories(): List<CategoryEntity>
 
+    @Query("SELECT ${CategoryEntity.ID_COLUMN} FROM ${CategoryEntity.TABLE_NAME}")
+    suspend fun getCategoriesIds(): List<Int>
+
     @Query("SELECT * FROM ${CategoryEntity.TABLE_NAME}")
     fun getCategoriesFlow(): Flow<List<CategoryEntity>>
 
@@ -27,4 +30,21 @@ interface CategoryDao {
 
     @Query("SELECT COUNT(*) FROM ${CategoryEntity.TABLE_NAME}")
     suspend fun getNumOfCategories(): Int
+
+    @Query("DELETE FROM ${CategoryEntity.TABLE_NAME} WHERE ${CategoryEntity.ID_COLUMN} IN (:categoriesIds)")
+    suspend fun deleteCategories(categoriesIds: Set<Int>)
+
+    @Query("UPDATE ${CategoryEntity.TABLE_NAME} SET " +
+            "${CategoryEntity.NUM_OF_QUESTIONS_COLUMN} = :numQuestions, " +
+            "${CategoryEntity.NUM_OF_EASY_QUESTIONS_COLUMN} = :numEasyQuestions, " +
+            "${CategoryEntity.NUM_OF_MEDIUM_QUESTIONS_COLUMN} = :numMediumQuestions, " +
+            "${CategoryEntity.NUM_OF_HARD_QUESTIONS_COLUMN} = :numHardQuestions " +
+            "WHERE ${CategoryEntity.ID_COLUMN} = :categoryId")
+    suspend fun updateCategory(
+        categoryId: Int,
+        numQuestions: Int,
+        numEasyQuestions: Int,
+        numMediumQuestions: Int,
+        numHardQuestions: Int
+    )
 }

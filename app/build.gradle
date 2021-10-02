@@ -80,4 +80,16 @@ dependencies {
     implementation "androidx.compose.runtime:runtime-livedata:$compose_version"
 
     implementation 'com.jakewharton.timber:timber:5.0.1'
+
+    implementation("androidx.hilt:hilt-work:1.0.0")
+    kapt("androidx.hilt:hilt-compiler:1.0.0")
+
+    // Kotlin + coroutines
+    implementation("androidx.work:work-runtime-ktx:$work_version")
+    // optional - Test helpers
+    androidTestImplementation("androidx.work:work-testing:$work_version")
+    // optional - Multiprocess support
+    implementation "androidx.work:work-multiprocess:$work_version"
+
+
 }
