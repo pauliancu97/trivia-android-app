@@ -34,7 +34,7 @@ class TriviaRepository @Inject constructor(
         private const val NUM_MAX_QUESTIONS_PER_CALL = 50
     }
 
-    suspend fun fetchCategories() {
+    suspend fun fetchCategories() = withContext(Dispatchers.IO) {
         val categoriesSummaries = triviaService.getCategoriesLookupResponse()
         val categoriesQuestionsCount = categoriesSummaries.categories
             .map { category ->
@@ -60,6 +60,10 @@ class TriviaRepository @Inject constructor(
                 )
             }
         categoryDao.insertAll(categoriesEntities)
+    }
+
+    suspend fun hasSavedCategories(): Boolean = withContext(Dispatchers.IO) {
+        categoryDao.getNumOfCategories() != 0
     }
 
     suspend fun getCategories() = categoryDao.getCategories()

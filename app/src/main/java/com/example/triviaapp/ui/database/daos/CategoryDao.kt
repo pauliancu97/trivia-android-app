@@ -24,4 +24,7 @@ interface CategoryDao {
 
     @Query("SELECT * FROM ${CategoryEntity.TABLE_NAME} WHERE ${CategoryEntity.NAME_COLUMN} = :name")
     suspend fun getCategoryByName(name: String): CategoryEntity?
+
+    @Query("SELECT COUNT(*) FROM ${CategoryEntity.TABLE_NAME}")
+    suspend fun getNumOfCategories(): Int
 }

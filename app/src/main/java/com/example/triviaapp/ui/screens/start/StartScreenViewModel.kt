@@ -17,11 +17,11 @@ class StartScreenViewModel @Inject constructor(
     private val isFetchingMutableLiveData: MutableLiveData<Boolean> = MutableLiveData(false)
 
     suspend fun loadCategories() {
-        isFetchingMutableLiveData.value = true
-        withContext(Dispatchers.IO) {
+        if (!triviaRepository.hasSavedCategories()) {
+            isFetchingMutableLiveData.value = true
             triviaRepository.fetchCategories()
+            isFetchingMutableLiveData.value = false
         }
-        isFetchingMutableLiveData.value = false
     }
 
     fun isFetchingLiveData(): LiveData<Boolean> = isFetchingMutableLiveData
