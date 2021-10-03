@@ -4,6 +4,7 @@ import android.content.Context
 import androidx.hilt.work.HiltWorker
 import androidx.work.*
 import com.example.triviaapp.BuildConfig
+import com.example.triviaapp.ui.notifications.NotificationsHelper
 import com.example.triviaapp.ui.repositories.QuestionNotificationRepository
 import com.example.triviaapp.ui.repositories.TriviaRepository
 import dagger.assisted.Assisted
@@ -23,7 +24,8 @@ class QuestionNotificationWorker @AssistedInject constructor(
     @Assisted workerParameters: WorkerParameters,
     private val triviaRepository: TriviaRepository,
     private val questionNotificationRepository: QuestionNotificationRepository,
-    private val questionNotificationWorkerRequester: QuestionNotificationWorkerRequester
+    private val questionNotificationWorkerRequester: QuestionNotificationWorkerRequester,
+    private val notificationsHelper: NotificationsHelper
 ): CoroutineWorker(appContext, workerParameters) {
     override suspend fun doWork(): Result =
         try {
@@ -33,6 +35,7 @@ class QuestionNotificationWorker @AssistedInject constructor(
             )
             if (question != null) {
                 Timber.d("Question Notification $question")
+                notificationsHelper.showNotification(question)
                 val isDebug = inputData.getBoolean(KEY_IS_DEBUG, false)
                 if (isDebug) {
                     delay(

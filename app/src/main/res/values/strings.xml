@@ -59,4 +59,7 @@
     <string name="light">Light</string>
     <string name="dark">Dark</string>
     <string name="selected_theme">Select theme</string>
+    <string name="notification_channel_name">Quiz Notifications</string>
+    <string name="notification_channel_description">Quiz Notifications</string>
+    <string name="category_and_difficulty">%1$s, %2$s</string>
 </resources>
