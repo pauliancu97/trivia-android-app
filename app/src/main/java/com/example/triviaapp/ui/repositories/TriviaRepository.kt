@@ -122,6 +122,22 @@ class TriviaRepository @Inject constructor(
     fun getCategoriesFlow() = categoryDao.getCategoriesFlow()
         .map { it.map { categoryEntity -> categoryEntity.toModel() } }
 
+    suspend fun getSingleQuestionFromService(
+        category: Category?,
+        difficulty: Difficulty?
+    ): Question? = withContext(Dispatchers.IO) {
+        try {
+            triviaService.getQuestionsLookupResponse(
+                difficulty = difficulty?.apiString(),
+                category = category?.id,
+                numOfQuestions = 1,
+                token = null
+            ).results.firstOrNull()?.toQuestion()
+        } catch (t: Throwable) {
+            null
+        }
+    }
+
     suspend fun fetchQuestions(category: Category?, difficulty: Difficulty?, numOfQuestions: Int): List<Question> {
         val token = triviaService.getTokenResponse().token
         val questionsResponses = mutableListOf<QuestionResponse>()

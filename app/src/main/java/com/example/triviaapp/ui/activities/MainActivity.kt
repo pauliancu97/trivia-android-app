@@ -3,22 +3,13 @@ package com.example.triviaapp.ui.activities
 import android.os.Bundle
 import androidx.activity.ComponentActivity
 import androidx.activity.compose.setContent
-import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.Column
-import androidx.compose.foundation.layout.Row
 import androidx.compose.material.*
-import androidx.compose.material.icons.Icons
-import androidx.compose.material.icons.filled.Menu
 import androidx.compose.runtime.*
-import androidx.compose.ui.Modifier
-import androidx.compose.ui.res.stringResource
 import androidx.hilt.navigation.compose.hiltViewModel
-import androidx.lifecycle.viewmodel.compose.viewModel
-import androidx.navigation.NavController
 import androidx.navigation.NavHostController
 import androidx.navigation.NavType
 import androidx.navigation.compose.*
-import com.example.triviaapp.R
 import com.example.triviaapp.ui.animations.EnterFromRightAnimation
 import com.example.triviaapp.ui.dialogs.deletequiztemplate.DeleteQuizTemplateViewModel
 import com.example.triviaapp.ui.dialogs.playquiztemplate.PlayQuizTemplateDialogViewModel
@@ -45,7 +36,6 @@ import com.example.triviaapp.ui.screens.start.StartScreenViewModel
 import com.example.triviaapp.ui.theme.TriviaAppTheme
 import dagger.hilt.android.AndroidEntryPoint
 import kotlinx.coroutines.launch
-import javax.inject.Inject
 
 @AndroidEntryPoint
 class MainActivity : ComponentActivity() {
@@ -54,7 +44,7 @@ class MainActivity : ComponentActivity() {
         super.onCreate(savedInstanceState)
         setContent {
             val mainViewModel = hiltViewModel<MainViewModel>()
-            mainViewModel.enqueueUpdateCategoriesWorker()
+            mainViewModel.enqueueWorkers()
             val themeSetting by mainViewModel.themeSettingFlow().collectAsState(mainViewModel.getThemeSetting())
             TriviaApp(themeSetting)
         }
