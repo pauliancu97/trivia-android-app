@@ -2,7 +2,9 @@ package com.example.triviaapp.ui.notifications
 
 import android.app.NotificationChannel
 import android.app.NotificationManager
+import android.app.PendingIntent
 import android.content.Context
+import android.content.Intent
 import android.os.Build
 import androidx.core.app.NotificationCompat
 import androidx.core.app.NotificationManagerCompat
@@ -36,7 +38,7 @@ class NotificationsHelper @Inject constructor(
         }
     }
 
-    fun showNotification(question: Question) {
+    fun showQuestionNotification(question: Question) {
         val title = context.resources.getString(
             R.string.category_and_difficulty,
             question.category.name,
@@ -50,6 +52,42 @@ class NotificationsHelper @Inject constructor(
                 .bigText(question.text)
             )
             .setPriority(NotificationCompat.PRIORITY_DEFAULT)
+            .addQuestionAction(question, context)
+        with(NotificationManagerCompat.from(context)) {
+            notify(NOTIFICATION_ID, builder.build())
+        }
+    }
+
+    fun showAnswerNotification(answerData: AnswerData) {
+        val text = when (answerData) {
+            is AnswerData.AnswerBoolean -> {
+                context.resources.getString(
+                    if (answerData.isCorrect) R.string.correct else R.string.wrong
+                )
+            }
+            is AnswerData.AnswerMultiple -> {
+                if (answerData.isCorrect) {
+                    context.resources.getString(R.string.correct)
+                } else {
+                    context.resources.getString(
+                        R.string.wrong_with_answer,
+                        answerData.correctAnswer
+                    )
+                }
+            }
+        }
+        val builder = NotificationCompat.Builder(context, NOTIFICATION_CHANNEL_ID)
+            .setSmallIcon(R.drawable.quiz)
+            .setContentTitle(context.resources.getString(R.string.app_title))
+            .setContentText(text)
+            .setStyle(NotificationCompat.BigTextStyle()
+                .bigText(text)
+            )
+            .setPriority(NotificationCompat.PRIORITY_DEFAULT)
+            .setAutoCancel(true)
+            .setContentIntent(
+                PendingIntent.getActivity(context, 0, Intent(), 0)
+            )
         with(NotificationManagerCompat.from(context)) {
             notify(NOTIFICATION_ID, builder.build())
         }

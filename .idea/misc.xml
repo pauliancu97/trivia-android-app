@@ -51,11 +51,14 @@
         <entry key="../../../layout/compose-model-1633168056005.xml" value="0.5" />
         <entry key="../../../layout/compose-model-1633168056027.xml" value="0.14757969303423848" />
         <entry key="../../../layout/compose-model-1633169623028.xml" value="0.15878378378378377" />
+        <entry key="app/src/main/res/drawable/close.xml" value="0.1388888888888889" />
         <entry key="app/src/main/res/drawable/delete.xml" value="0.1" />
+        <entry key="app/src/main/res/drawable/done.xml" value="0.1388888888888889" />
         <entry key="app/src/main/res/drawable/edit.xml" value="0.1045" />
         <entry key="app/src/main/res/drawable/expand_more.xml" value="0.1755" />
         <entry key="app/src/main/res/drawable/play_arrow.xml" value="0.1045" />
         <entry key="app/src/main/res/drawable/quiz.xml" value="0.1135" />
+        <entry key="app/src/main/res/drawable/send.xml" value="0.1388888888888889" />
       </map>
     </option>
   </component>

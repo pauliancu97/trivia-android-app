@@ -22,6 +22,11 @@
                 <category android:name="android.intent.category.LAUNCHER" />
             </intent-filter>
         </activity>
+        <receiver android:name=".ui.notifications.QuestionAnswerReceiver" android:exported="true">
+            <intent-filter>
+                <action android:name="com.example.triviaapp.ANSWER_QUESTION"/>
+            </intent-filter>
+        </receiver>
         <provider
             android:name="androidx.startup.InitializationProvider"
             android:authorities="${applicationId}.androidx-startup"

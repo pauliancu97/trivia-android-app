@@ -35,7 +35,7 @@ class QuestionNotificationWorker @AssistedInject constructor(
             )
             if (question != null) {
                 Timber.d("Question Notification $question")
-                notificationsHelper.showNotification(question)
+                notificationsHelper.showQuestionNotification(question)
                 val isDebug = inputData.getBoolean(KEY_IS_DEBUG, false)
                 if (isDebug) {
                     delay(
@@ -78,7 +78,7 @@ class QuestionNotificationWorkerRequester @Inject constructor(
             WorkManager.getInstance(context)
                 .enqueueUniqueWork(
                     QUESTION_NOTIFICATION_WORKER_NAME,
-                    ExistingWorkPolicy.KEEP,
+                    ExistingWorkPolicy.REPLACE,
                     workRequest
                 )
         } else {

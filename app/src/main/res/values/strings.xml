@@ -62,4 +62,8 @@
     <string name="notification_channel_name">Quiz Notifications</string>
     <string name="notification_channel_description">Quiz Notifications</string>
     <string name="category_and_difficulty">%1$s, %2$s</string>
+    <string name="answer">Answer</string>
+    <string name="correct">Correct!</string>
+    <string name="wrong">Wrong!</string>
+    <string name="wrong_with_answer">Wrong! Correct answer: \"%1$s\"</string>
 </resources>
