@@ -5,6 +5,7 @@ import kotlinx.coroutines.ExperimentalCoroutinesApi
 import kotlinx.coroutines.channels.awaitClose
 import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.callbackFlow
+import kotlinx.coroutines.flow.map
 
 @ExperimentalCoroutinesApi
 fun SharedPreferences.getBooleanFlow(preferenceKey: String): Flow<Boolean> = callbackFlow {
@@ -73,3 +74,20 @@ fun SharedPreferences.getIntFlow(preferenceKey: String): Flow<Int> = callbackFlo
     registerOnSharedPreferenceChangeListener(callback)
     awaitClose { unregisterOnSharedPreferenceChangeListener(callback) }
 }
+
+@ExperimentalCoroutinesApi
+inline fun <reified T: Enum<T>> SharedPreferences.getEnumFlow(key: String): Flow<T?> =
+    getStringFlow(key)
+        .map { name ->
+            valueOrNullOf<T>(name)
+        }
+
+@ExperimentalCoroutinesApi
+inline fun <reified T: Enum<T>> SharedPreferences.getNonNullableEnumFlow(
+    key: String,
+    default: T
+): Flow<T> =
+    getStringFlow(key)
+        .map { name ->
+            valueOrNullOf<T>(name) ?: default
+        }

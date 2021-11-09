@@ -4,7 +4,6 @@ import android.content.Context
 import android.content.SharedPreferences
 import com.example.triviaapp.ui.models.Category
 import com.example.triviaapp.ui.models.Difficulty
-import com.example.triviaapp.ui.models.DifficultyOption
 import com.example.triviaapp.ui.models.QuestionType
 import com.example.triviaapp.ui.utils.*
 import dagger.hilt.android.qualifiers.ApplicationContext
@@ -72,8 +71,7 @@ class QuestionNotificationRepository @Inject constructor(
 
     @ExperimentalCoroutinesApi
     fun getDifficultyFlow(): Flow<Difficulty?> =
-        sharedPreferences.getStringFlow(KEY_DIFFICULTY)
-            .map { valueOrNullOf<Difficulty>(it) }
+        sharedPreferences.getEnumFlow<Difficulty>(KEY_DIFFICULTY)
 
     private var periodValue: Long
         get() = sharedPreferences.getLong(KEY_PERIOD_VALUE, DEFAULT_PERIOD_VALUE)
@@ -104,8 +102,7 @@ class QuestionNotificationRepository @Inject constructor(
     fun getPeriodFlow(): Flow<QuestionNotificationPeriod> =
         combine(
             sharedPreferences.getLongFlow(KEY_PERIOD_VALUE),
-            sharedPreferences.getStringFlow(KEY_PERIOD_TIME_UNIT)
-                .map { valueOrNullOf<TimeUnit>(it) ?: DEFAULT_PERIOD_TIME_UNIT }
+            sharedPreferences.getNonNullableEnumFlow(KEY_PERIOD_TIME_UNIT, DEFAULT_PERIOD_TIME_UNIT)
         ) { periodValue, periodTimeUnit ->
             QuestionNotificationPeriod(periodValue, periodTimeUnit)
         }
@@ -131,6 +128,5 @@ class QuestionNotificationRepository @Inject constructor(
 
     @ExperimentalCoroutinesApi
     fun getQuestionTypeFlow(): Flow<QuestionType?> =
-        sharedPreferences.getStringFlow(KEY_QUESTION_TYPE)
-            .map { valueOrNullOf<QuestionType>(it) }
+        sharedPreferences.getEnumFlow<QuestionType>(KEY_QUESTION_TYPE)
 }
