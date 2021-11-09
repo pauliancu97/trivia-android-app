@@ -124,12 +124,14 @@ class TriviaRepository @Inject constructor(
 
     suspend fun getSingleQuestionFromService(
         category: Category?,
-        difficulty: Difficulty?
+        difficulty: Difficulty?,
+        questionType: QuestionType?
     ): Question? = withContext(Dispatchers.IO) {
         try {
             triviaService.getQuestionsLookupResponse(
                 difficulty = difficulty?.apiString(),
                 category = category?.id,
+                type = questionType?.identifier,
                 numOfQuestions = 1,
                 token = null
             ).results.firstOrNull()?.toQuestion()

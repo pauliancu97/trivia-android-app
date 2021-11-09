@@ -26,6 +26,16 @@ interface TriviaService {
         @Query("encode") encode: String = "urlLegacy"
     ): QuestionsLookupResponse
 
+    @GET("api.php")
+    suspend fun getQuestionsLookupResponse(
+        @Query("difficulty") difficulty: String?,
+        @Query("category") category: Int?,
+        @Query("type") type: String?,
+        @Query("amount") numOfQuestions: Int,
+        @Query("token") token: String?,
+        @Query("encode") encode: String = "urlLegacy"
+    ): QuestionsLookupResponse
+
     companion object {
         const val BASE_URL = "https://opentdb.com/"
     }

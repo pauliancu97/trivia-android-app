@@ -22,9 +22,9 @@ sealed class Question {
     ) : Question()
 }
 
-enum class QuestionType {
-    Multiple,
-    Boolean;
+enum class QuestionType(val identifier: String) {
+    Multiple("multiple"),
+    Boolean("boolean");
 
     companion object {
         fun fromString(string: String) =

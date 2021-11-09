@@ -4,6 +4,7 @@ import android.content.Context
 import android.content.SharedPreferences
 import com.example.triviaapp.ui.models.ThemeSetting
 import dagger.hilt.android.qualifiers.ApplicationContext
+import kotlinx.coroutines.ExperimentalCoroutinesApi
 import kotlinx.coroutines.channels.awaitClose
 import kotlinx.coroutines.channels.trySendBlocking
 import kotlinx.coroutines.flow.Flow
@@ -23,6 +24,7 @@ class SettingsRepository @Inject constructor(
         Context.MODE_PRIVATE
     )
 
+    @ExperimentalCoroutinesApi
     fun themeSettingFlow(): Flow<ThemeSetting> = callbackFlow {
         val callback = object : SharedPreferences.OnSharedPreferenceChangeListener {
             override fun onSharedPreferenceChanged(p0: SharedPreferences?, p1: String?) {

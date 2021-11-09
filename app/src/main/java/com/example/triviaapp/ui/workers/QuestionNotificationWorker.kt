@@ -31,7 +31,8 @@ class QuestionNotificationWorker @AssistedInject constructor(
         try {
             val question = triviaRepository.getSingleQuestionFromService(
                 questionNotificationRepository.getCategory(),
-                questionNotificationRepository.difficultyOption.toDifficulty()
+                questionNotificationRepository.difficulty,
+                questionNotificationRepository.questionType
             )
             if (question != null) {
                 Timber.d("Question Notification $question")
