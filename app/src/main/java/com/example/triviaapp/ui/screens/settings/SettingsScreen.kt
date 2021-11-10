@@ -13,25 +13,31 @@ import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import com.example.triviaapp.R
 import com.example.triviaapp.ui.models.ThemeSetting
+import kotlinx.coroutines.ExperimentalCoroutinesApi
 
+@ExperimentalCoroutinesApi
 @Composable
 fun SettingsScreen(
-    viewModel: SettingsScreenViewModel
+    themeSettingsViewModel: ThemeSettingsScreenViewModel,
+    questionNotificationSettingsViewModel: QuestionNotificationSettingsViewModel
 ) {
-    val state by viewModel.stateFlow.collectAsState(SettingsScreenState())
-    SettingsScreen(
-        settingsScreenState = state,
-        onThemeSettingClicked = {  viewModel.showThemeSettingDialog() },
-        onDismissThemeSettingDialog = { viewModel.hideThemeSettingDialog() },
-        onThemeSettingSelected = {
-            viewModel.setThemeSetting(it)
-            viewModel.hideThemeSettingDialog()
-        }
-    )
+    val themeSettingState by themeSettingsViewModel.stateFlow.collectAsState(SettingsScreenState())
+    Column {
+        ThemeSettingsScreen(
+            settingsScreenState = themeSettingState,
+            onThemeSettingClicked = { themeSettingsViewModel.showThemeSettingDialog() },
+            onDismissThemeSettingDialog = { themeSettingsViewModel.hideThemeSettingDialog() },
+            onThemeSettingSelected = {
+                themeSettingsViewModel.setThemeSetting(it)
+                themeSettingsViewModel.hideThemeSettingDialog()
+            }
+        )
+        QuestionNotificationSettingsScreen(questionNotificationSettingsViewModel)
+    }
 }
 
 @Composable
-fun SettingsScreen(
+fun ThemeSettingsScreen(
     settingsScreenState: SettingsScreenState,
     onThemeSettingClicked: () -> Unit,
     onDismissThemeSettingDialog: () -> Unit,
@@ -39,7 +45,6 @@ fun SettingsScreen(
 ) {
     Column(
         modifier = Modifier
-            .fillMaxSize()
             .background(MaterialTheme.colors.background)
     ) {
         Surface(
@@ -55,7 +60,7 @@ fun SettingsScreen(
                     .padding(5.dp)
             ) {
                 Text(
-                    text = stringResource(R.string.Settings),
+                    text = stringResource(R.string.theme),
                     style = MaterialTheme.typography.h5,
                     color = MaterialTheme.colors.onSurface
                 )
@@ -102,7 +107,7 @@ fun SettingsScreen(
 @Composable
 @Preview
 fun PreviewSettingsScreenNoAlert() {
-    SettingsScreen(
+    ThemeSettingsScreen(
         settingsScreenState = SettingsScreenState(
             themeSetting = ThemeSetting.SystemDefault,
             isThemeSettingDialogShown = false
@@ -116,7 +121,7 @@ fun PreviewSettingsScreenNoAlert() {
 @Composable
 @Preview
 fun PreviewSettingsScreenWithAlert() {
-    SettingsScreen(
+    ThemeSettingsScreen(
         settingsScreenState = SettingsScreenState(
             themeSetting = ThemeSetting.SystemDefault,
             isThemeSettingDialogShown = true

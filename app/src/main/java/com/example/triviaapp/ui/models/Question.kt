@@ -1,5 +1,7 @@
 package com.example.triviaapp.ui.models
 
+import com.example.triviaapp.R
+
 sealed class Question {
 
     abstract val text: String
@@ -22,9 +24,9 @@ sealed class Question {
     ) : Question()
 }
 
-enum class QuestionType(val identifier: String) {
-    Multiple("multiple"),
-    Boolean("boolean");
+enum class QuestionType(val identifier: String, val textId: Int) {
+    Multiple("multiple", R.string.multiple_choices),
+    Boolean("boolean", R.string.true_false);
 
     companion object {
         fun fromString(string: String) =

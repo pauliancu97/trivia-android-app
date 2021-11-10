@@ -29,8 +29,9 @@ import com.example.triviaapp.ui.screens.playquiz.PlayQuizScreen
 import com.example.triviaapp.ui.screens.playquiz.PlayQuizViewModel
 import com.example.triviaapp.ui.screens.quiztemplates.QuizTemplatesScreen
 import com.example.triviaapp.ui.screens.quiztemplates.QuizTemplatesViewModel
+import com.example.triviaapp.ui.screens.settings.QuestionNotificationSettingsViewModel
 import com.example.triviaapp.ui.screens.settings.SettingsScreen
-import com.example.triviaapp.ui.screens.settings.SettingsScreenViewModel
+import com.example.triviaapp.ui.screens.settings.ThemeSettingsScreenViewModel
 import com.example.triviaapp.ui.screens.start.StartScreen
 import com.example.triviaapp.ui.screens.start.StartScreenViewModel
 import com.example.triviaapp.ui.theme.TriviaAppTheme
@@ -332,8 +333,12 @@ fun TriviaAppNavHost(
                 composable(NavigationDestinations.Settings.name) {
                     Column {
                         TopMenuAppBar(openDrawer)
-                        val viewModel = hiltViewModel<SettingsScreenViewModel>()
-                        SettingsScreen(viewModel = viewModel)
+                        val themeViewModel = hiltViewModel<ThemeSettingsScreenViewModel>()
+                        val notificationViewModel = hiltViewModel<QuestionNotificationSettingsViewModel>()
+                        SettingsScreen(
+                            themeSettingsViewModel = themeViewModel,
+                            notificationViewModel
+                        )
                     }
                 }
             }

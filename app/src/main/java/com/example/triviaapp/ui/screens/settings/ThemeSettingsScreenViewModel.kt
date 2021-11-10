@@ -19,7 +19,7 @@ data class SettingsScreenState(
 )
 
 @HiltViewModel
-class SettingsScreenViewModel @Inject constructor(
+class ThemeSettingsScreenViewModel @Inject constructor(
     private val settingsRepository: SettingsRepository
 ): ViewModel() {
 

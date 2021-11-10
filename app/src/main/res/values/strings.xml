@@ -66,4 +66,18 @@
     <string name="correct">Correct!</string>
     <string name="wrong">Wrong!</string>
     <string name="wrong_with_answer">Wrong! Correct answer: \"%1$s\"</string>
+    <string name="question_notifications">Question Notifications: %1$s</string>
+    <string name="enabled_label">Enabled</string>
+    <string name="disabled_label">Disabled</string>
+    <string name="question_notification_category">Question Notification Category</string>
+    <string name="question_notification_difficulty">Question Notification Difficulty</string>
+    <string name="theme">Theme</string>
+    <string name="fifteen_minutes">15 min</string>
+    <string name="thirty_minutes">30 min</string>
+    <string name="one_hour">1 hour</string>
+    <string name="two_hours">2 hours</string>
+    <string name="multiple_choices">Multiple Choices</string>
+    <string name="true_false">True or False</string>
+    <string name="question_notification_type">Question Notification Type</string>
+    <string name="question_notification_period">Question Notification Period</string>
 </resources>

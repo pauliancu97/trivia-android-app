@@ -41,8 +41,8 @@ class QuestionNotificationWorker @AssistedInject constructor(
                 if (isDebug) {
                     delay(
                         TimeUnit.MILLISECONDS.convert(
-                            questionNotificationRepository.period.periodValue,
-                            questionNotificationRepository.period.periodTimeUnit
+                            questionNotificationRepository.periodOption.period.periodValue,
+                            questionNotificationRepository.periodOption.period.periodTimeUnit
                         )
                     )
                     questionNotificationWorkerRequester.enqueue()
@@ -72,8 +72,8 @@ class QuestionNotificationWorkerRequester @Inject constructor(
                     workDataOf(KEY_IS_DEBUG to true)
                 )
                 .setInitialDelay(
-                    questionNotificationRepository.period.periodValue,
-                    questionNotificationRepository.period.periodTimeUnit
+                    questionNotificationRepository.periodOption.period.periodValue,
+                    questionNotificationRepository.periodOption.period.periodTimeUnit
                 )
                 .build()
             WorkManager.getInstance(context)
@@ -84,8 +84,8 @@ class QuestionNotificationWorkerRequester @Inject constructor(
                 )
         } else {
             val workRequest = PeriodicWorkRequestBuilder<QuestionNotificationWorker>(
-                questionNotificationRepository.period.periodValue,
-                questionNotificationRepository.period.periodTimeUnit
+                questionNotificationRepository.periodOption.period.periodValue,
+                questionNotificationRepository.periodOption.period.periodTimeUnit
             )
                 .setConstraints(
                     Constraints.Builder()
@@ -96,8 +96,8 @@ class QuestionNotificationWorkerRequester @Inject constructor(
                     workDataOf(KEY_IS_DEBUG to false)
                 )
                 .setInitialDelay(
-                    questionNotificationRepository.period.periodValue,
-                    questionNotificationRepository.period.periodTimeUnit
+                    questionNotificationRepository.periodOption.period.periodValue,
+                    questionNotificationRepository.periodOption.period.periodTimeUnit
                 )
                 .build()
             WorkManager.getInstance(context)
